@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar fixed class="cyan" dark>
+  <v-toolbar fixed class="light-green darken-1" dark>
     <v-toolbar-title class="mr-4">
       <router-link 
         class="home"
@@ -7,7 +7,7 @@
         :to="{
           name: 'songs'
         }">
-        TabTracker
+        Tutukani
       </router-link>
     </v-toolbar-title>
 
@@ -18,7 +18,7 @@
         :to="{
           name: 'songs'
         }">
-        Browse
+        How it works
       </v-btn>
     </v-toolbar-items>
 
@@ -76,6 +76,6 @@ export default {
 }
 
 .home:hover {
-  color: #E9E;
+  color: #1B5E20;
 }
 </style>

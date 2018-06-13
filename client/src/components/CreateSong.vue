@@ -71,7 +71,7 @@
 
       <v-btn
         dark
-        class="cyan"
+        class="light-green darken-1"
         @click="create">
         Create Song
       </v-btn>
@@ -101,6 +101,7 @@ export default {
   },
   methods: {
     async create () {
+      console.log('this.song--->', this.song)
       this.error = null
       const areAllFieldsFilledIn = Object
         .keys(this.song)

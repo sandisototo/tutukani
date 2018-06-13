@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Register from '@/components/Register'
+import RegisterUser from '@/components/RegisterUser'
 import Login from '@/components/Login'
 import Songs from '@/components/Songs/Index'
 import CreateSong from '@/components/CreateSong'
@@ -14,7 +14,7 @@ export default new Router({
     {
       path: '/register',
       name: 'register',
-      component: Register
+      component: RegisterUser
     },
     {
       path: '/login',

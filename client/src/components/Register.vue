@@ -22,7 +22,7 @@
         <br>
         <v-btn
           dark
-          class="cyan"
+          class="light-green darken-1"
           @click="register">
           Register
         </v-btn>

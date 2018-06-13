@@ -14,7 +14,7 @@
 
         <v-btn
           dark
-          class="cyan"
+          class="light-green darken-1"
           :to="{
             name: 'song-edit', 
             params () {
@@ -29,7 +29,7 @@
         <v-btn
           v-if="isUserLoggedIn && !bookmark"
           dark
-          class="cyan"
+          class="light-green darken-1"
           @click="setAsBookmark">
           Set As Bookmark
         </v-btn>
@@ -37,7 +37,7 @@
         <v-btn
           v-if="isUserLoggedIn && bookmark"
           dark
-          class="cyan"
+          class="light-green darken-1"
           @click="unsetAsBookmark">
           Unset As Bookmark
         </v-btn>

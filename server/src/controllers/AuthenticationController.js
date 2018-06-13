@@ -1,4 +1,5 @@
-const {User} = require('../models')
+const { User } = require('../models')
+const { Account } = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
 
@@ -10,26 +11,30 @@ function jwtSignUser (user) {
 }
 
 module.exports = {
-  async register (req, res) {
+  async register(req, res) {
     try {
-      const user = await User.create(req.body)
+      const { body } = req
+      console.log('body--->', body)
+      const user = await User.create(body) // It's breaking here :(
+      
       const userJson = user.toJSON()
       res.send({
         user: userJson,
         token: jwtSignUser(userJson)
       })
     } catch (err) {
+      console.log('err--->', err)
       res.status(400).send({
-        error: 'This email account is already in use.'
+        error: 'Something went wrong!'
       })
     }
   },
   async login (req, res) {
     try {
-      const {email, password} = req.body
+      const {username, password} = req.body
       const user = await User.findOne({
         where: {
-          email: email
+          username
         }
       })
 
