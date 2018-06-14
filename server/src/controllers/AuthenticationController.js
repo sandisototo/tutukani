@@ -14,18 +14,26 @@ module.exports = {
   async register(req, res) {
     try {
       const { body } = req
-      console.log('body--->', body)
-      const user = await User.create(body) // It's breaking here :(
-      
-      const userJson = user.toJSON()
-      res.send({
-        user: userJson,
-        token: jwtSignUser(userJson)
-      })
+      const user = await User.create(body)
+        .then(async (newUser) => {
+          const account = await newUser.createAccount(body.account)
+          const userJson = newUser.toJSON()
+          userJson['account'] = account
+          return  userJson  
+        }).then((newUserAccount) => { 
+          res.json({
+            user: newUserAccount,
+            token: jwtSignUser(newUserAccount)
+          })
+        })
     } catch (err) {
       console.log('err--->', err)
+      const error = (err && err.name == 'SequelizeUniqueConstraintError') ?
+        'Your cell number or email has been used to register here before.' :
+        'Something went wrong!'
+      
       res.status(400).send({
-        error: 'Something went wrong!'
+        error
       })
     }
   },

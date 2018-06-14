@@ -1,5 +1,4 @@
-const Promise = require('bluebird')
-const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
+const bcrypt = require('bcryptjs')
 
 const { hashPassword } = require('./../helpers')
 
@@ -23,7 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
-    password: DataTypes.STRING,
+    password: {
+      allowNull: false,
+      type: DataTypes.STRING,
+    },
     email: {
       type: DataTypes.STRING,
       unique: true
@@ -55,10 +57,12 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   User.prototype.comparePassword = function (password) {
-    return bcrypt.compareAsync(password, this.password)
+    return bcrypt.compare(password, this.password)
   }
 
-  User.associate = function (models) {}
+  User.associate = function (models) {
+    User.hasOne(models.Account)
+  }
 
   return User
 }
