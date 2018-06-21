@@ -15,13 +15,19 @@
           :rules="[required]"
           v-model="newUser.surname"
         ></v-text-field>
-
-        <v-text-field
-          label="Gender"
-          required
-          :rules="[required]"
-          v-model="newUser.gender"
-        ></v-text-field>
+        
+        <v-radio-group v-model="newUser.gender" :rules="[required]" required row>
+            <v-radio
+              label="Male"
+              color="success"
+              value="Male"
+            ></v-radio>
+            <v-radio
+              label="Female"
+              color="success"
+              value="Female"
+            ></v-radio>
+          </v-radio-group>
 
         <v-text-field
           label="Cell Number"
@@ -33,6 +39,7 @@
 
         <v-text-field
           label="Password"
+          placeholder="no spaces allowed"
           type="password"
           required
           :rules="[required]"
@@ -58,7 +65,7 @@
     <v-flex xs8>
       <panel title="Address" class="ml-2 mb-2">
         <v-text-field
-          label="Enter you full address"
+          label="Enter your full address"
           multi-line
           v-model="newUser.address"
         ></v-text-field>
@@ -96,7 +103,11 @@
             <v-subheader>Account Type</v-subheader>
                 </v-flex>
                 <v-flex xs4>
-              <v-radio-group v-model="newUser.account.account_type" required>
+              <v-radio-group 
+              v-model="newUser.account.account_type"
+              required
+              :rules="[required]"
+              >
             <v-radio
               label="Cheque"
               color="success"
@@ -134,12 +145,25 @@
         ></v-text-field>
             </v-flex>
           </v-layout>
-  
       </panel>
 
       <div class="danger-alert" v-if="error">
         {{error}}
       </div>
+
+         <v-snackbar
+          class="error-alert"
+          :timeout="60000"
+          top="top"
+          color="error"
+          :vertical=true
+          v-model="errorAlert"
+    >
+      {{error}}
+       <v-btn dark flat @click.native="errorAlert = false">Close</v-btn>
+         </v-snackbar>
+
+  
 
       <v-btn
         dark
@@ -183,6 +207,7 @@ export default {
         'Standard Bank'
       ],
       error: null,
+      errorAlert: false,
       required: (value) => !!value || 'Required.',
       emailRules: [
         v => !!v || 'E-mail is required',
@@ -196,8 +221,8 @@ export default {
         v.name !== null &&
         v.surname !== null &&
         v.cell_number !== null &&
-        v.password !== null &&
-        v.email !== null &&
+        v.password !== '' && v.password !== null &&
+        v.email !== '' && v.email !== null &&
         v.gender !== null &&
         v.account !== null &&
         v.account.bank !== null &&
@@ -210,6 +235,7 @@ export default {
       this.error = null
       if (!this.areAllFieldsFilledIn(this.newUser)) {
         this.error = 'Please fill in all the required fields.'
+        this.errorAlert = true
         return
       }
 
@@ -222,17 +248,19 @@ export default {
           email: this.newUser.email,
           username: this.newUser.cell_number,
           gender: this.newUser.gender,
-          //refferal_number: this.newUser.refferal_number,
-          address: this.newUser.address
-          // account: this.newUser.account
+          refferal_number: this.newUser.refferal_number,
+          address: this.newUser.address,
+          account: this.newUser.account
         })
         this.$store.dispatch('setToken', response.data.token)
         this.$store.dispatch('setUser', response.data.user)
         this.$router.push({
           name: ''
         })
+        this.errorAlert = false
       } catch (error) {
         this.error = error.response.data.error
+        this.errorAlert = true
       }
     }
   }
@@ -240,4 +268,7 @@ export default {
 </script>
 
 <style scoped>
+.error-alert {
+  background-color: #ff5252;
+}
 </style>

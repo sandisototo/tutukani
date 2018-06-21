@@ -5,7 +5,7 @@
         class="home"
         tag="span"
         :to="{
-          name: 'songs'
+          name: 'my-account'
         }">
         Tutukani
       </router-link>
@@ -21,8 +21,15 @@
         How it works
       </v-btn>
     </v-toolbar-items>
-
-    <v-spacer></v-spacer>
+    <v-spacer/>
+    <v-spacer>
+      <p class="headline font-weight 400" v-if="$store.state.isUserLoggedIn">
+        Welcome
+        <v-avatar color="indigo">
+      <v-icon dark>account_circle</v-icon>
+    </v-avatar> <span style="font-size:15px;">{{$store.state.user.name}} {{$store.state.user.surname}},   you are on level <b>{{$store.state.user.level}}</b></span>
+      </p>
+    </v-spacer>
 
     <v-toolbar-items>
       <v-btn 
@@ -63,7 +70,7 @@ export default {
       this.$store.dispatch('setToken', null)
       this.$store.dispatch('setUser', null)
       this.$router.push({
-        name: 'songs'
+        name: 'login'
       })
     }
   }

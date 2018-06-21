@@ -18,7 +18,7 @@ module.exports = {
         .then(async (newUser) => {
           const account = await newUser.createAccount(body.account)
           const userJson = newUser.toJSON()
-          userJson['account'] = account
+          userJson['Account'] = account
           return  userJson  
         }).then((newUserAccount) => { 
           res.json({
@@ -37,25 +37,32 @@ module.exports = {
       })
     }
   },
-  async login (req, res) {
+  async login(req, res) {
     try {
       const {username, password} = req.body
       const user = await User.findOne({
         where: {
           username
-        }
+        },
+        include: [
+          {
+            model: Account
+          }
+        ]
       })
+
+      console.log('user--->', user)
 
       if (!user) {
         return res.status(403).send({
-          error: 'The login information was incorrect'
+          error: 'User not found. Please sign up first.'
         })
       }
 
       const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) {
         return res.status(403).send({
-          error: 'The login information was incorrect'
+          error: 'The password is incorrect'
         })
       }
 

@@ -1,8 +1,8 @@
 const AuthenticationController = require('./controllers/AuthenticationController')
-const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy')
-const SongsController = require('./controllers/SongsController')
-const BookmarksController = require('./controllers/BookmarksController')
-const HistoriesController = require('./controllers/HistoriesController')
+// const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy') turned off for testing purposes 
+
+const DonationTransactionController = require('./controllers/DonationTransactionController')
+const RewardsTransactionController = require('./controllers/RewardsTransactionController')
 
 const isAuthenticated = require('./policies/isAuthenticated')
 
@@ -11,30 +11,30 @@ module.exports = (app) => {
     AuthenticationController.register)
   app.post('/login',
     AuthenticationController.login)
-
-  app.get('/songs',
-    SongsController.index)
-  app.get('/songs/:songId',
-    SongsController.show)
-  app.put('/songs/:songId',
-    SongsController.put)
-  app.post('/songs',
-    SongsController.post)
-
-  app.get('/bookmarks',
-    isAuthenticated,
-    BookmarksController.index)
-  app.post('/bookmarks',
-    isAuthenticated,
-    BookmarksController.post)
-  app.delete('/bookmarks/:bookmarkId',
+  
+  app.get('/donation',
     isAuthenticated,  
-    BookmarksController.remove)
-
-  app.get('/histories',
+    DonationTransactionController.index)
+  app.post('/donation',
     isAuthenticated,
-    HistoriesController.index)
-  app.post('/histories',
+    DonationTransactionController.post)
+  app.put('/donation/:donationId',
+    isAuthenticated,   
+    DonationTransactionController.put)
+  app.delete('/donation/:donationId',
+    isAuthenticated,  
+    DonationTransactionController.remove)
+  
+  app.get('/rewards',
+    isAuthenticated,  
+    RewardsTransactionController.index)
+  app.post('/rewards',
     isAuthenticated,
-    HistoriesController.post)
+    RewardsTransactionController.post)
+  app.put('/rewards/:rewardId',
+    isAuthenticated,   
+    RewardsTransactionController.put)
+  app.delete('/rewards/:rewardId',
+    isAuthenticated,  
+    RewardsTransactionController.remove)
 }
