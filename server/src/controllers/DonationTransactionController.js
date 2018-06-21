@@ -13,21 +13,21 @@ const Op = require('Sequelize').Op;
         const donation = await DonationTransaction.findOne({
           where: {
               UserId: userId,
-              complete_status: 0,
               payment_status: {
                 [Op.or]: [0, 1]
               }
           }
         })
-        res.json(donation)
-        console.log('donation-->', donation)
-        return false
+        if (!donation) {
+          return res.status(404).send({
+            error: 'You have no active donation'
+          })
+        }
         const candidate = await User.findOne({
           UserId: donation.candidateId,
           status: 1
         })
-        console.log('candidate-->', candidate)
-        return false
+
         if (!candidate) {
           return res.status(404).send({
             error: 'The user account associated with your donation candidate might have been removed or suspended.'

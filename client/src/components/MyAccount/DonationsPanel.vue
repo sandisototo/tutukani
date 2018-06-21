@@ -2,23 +2,36 @@
   <panel title="Donate">
     <v-card height="450px">
       <div v-if="e1==='waiting'">
-        <v-flex xs12 v-if="!donation">
-        <p >
-         <center>You have not donated yet</center>
+      <v-flex xs12 v-if="donation && donation.complete_status === 1">
+        <p>
+         <center>Thank you for your donation.... </center>
         </p>
 
         <p class="title">
-          <center>You have no donation candidate to pay :(</center>
+          <center> Now it's time to upgrade :)</center>
         </p>
         <div class="text-xs-center">
           <v-btn round dark>Upgrade to level 2</v-btn>
         </div>
         </v-flex>
-      <v-flex xs12 v-if="donation">
+        <v-flex xs12 v-if="!donation">
+        <p>
+         <center>You have not donated yet</center>
+        </p>
+        <br/>
+        <br/>
+        <p class="title">
+          <center>Please wait... while we're still finding a suitable candidate for you.</center>
+        </p>
+        </v-flex>
+      <v-flex xs12 v-if="donation && donation.complete_status !== 1">
         <v-card>
           <v-card-title primary-title>
             <div>
               <div>
+                <p>
+                  <center>You have not donated yet</center>
+                </p>
                 <p style="font-size: 18px;">Here is your donation candidate information. Pay <b>R{{donation.amount}}</b> and get
                 <b>R 120</b> in return.</p>
               </div>

@@ -16,7 +16,7 @@
         flat 
         dark
         :to="{
-          name: 'songs'
+          name: 'my-account'
         }">
         How it works
       </v-btn>

@@ -15,8 +15,6 @@
 <script>
 import DonationsPanel from './DonationsPanel'
 import RewardsPanel from './RewardsPanel'
-
-// import PaymentTransactionService from '@/services/PaymentTransactionService'
 import {mapState} from 'vuex'
 
 export default {
@@ -38,9 +36,6 @@ export default {
         name: 'login'
       })
     }
-
-    // this.songs = (await SongsService.index()).data
-    // this.songs = {}
   }
 }
 </script>

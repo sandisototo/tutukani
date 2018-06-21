@@ -255,7 +255,7 @@ export default {
         this.$store.dispatch('setToken', response.data.token)
         this.$store.dispatch('setUser', response.data.user)
         this.$router.push({
-          name: ''
+          name: 'my-account'
         })
         this.errorAlert = false
       } catch (error) {
@@ -263,6 +263,11 @@ export default {
         this.errorAlert = true
       }
     }
+  },
+  async mounted () {
+    this.$store.state.isUserLoggedIn = false
+    this.$store.dispatch('setToken', null)
+    this.$store.dispatch('setUser', null)
   }
 }
 </script>
