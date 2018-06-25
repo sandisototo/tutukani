@@ -1,4 +1,5 @@
 const AuthenticationController = require('./controllers/AuthenticationController')
+const UsersController = require('./controllers/UsersController')
 // const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy') turned off for testing purposes 
 
 const DonationTransactionController = require('./controllers/DonationTransactionController')
@@ -11,6 +12,19 @@ module.exports = (app) => {
     AuthenticationController.register)
   app.post('/login',
     AuthenticationController.login)
+  
+  app.get('/users/:level',
+    // isAuthenticated,
+    UsersController.index)
+  app.post('/users',
+    // isAuthenticated,
+    UsersController.post)
+  app.put('/users/:userId',
+    // isAuthenticated,   
+    UsersController.put)
+  app.delete('/users/:userId',
+    // isAuthenticated,  
+    UsersController.remove)
   
   app.get('/donation',
     isAuthenticated,  

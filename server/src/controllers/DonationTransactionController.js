@@ -25,7 +25,8 @@ const Op = require('Sequelize').Op;
         }
         const candidate = await User.findOne({
           UserId: donation.candidateId,
-          status: 1
+          status: 1,
+          eligible: 1
         })
 
         if (!candidate) {
@@ -45,7 +46,8 @@ const Op = require('Sequelize').Op;
         res.json(donationJson)
       } catch (err) {
         res.status(500).send({
-          error: 'an error has occured trying to fetch relevant donation candidate 2'
+          err,
+          error: 'an error has occured trying to fetch relevant donation candidate'
         })
       }
     },

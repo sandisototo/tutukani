@@ -48,7 +48,6 @@
 
         <v-text-field
           label="Email"
-          required
           :rules="emailRules"
           v-model="newUser.email"
         ></v-text-field>
@@ -222,7 +221,6 @@ export default {
         v.surname !== null &&
         v.cell_number !== null &&
         v.password !== '' && v.password !== null &&
-        v.email !== '' && v.email !== null &&
         v.gender !== null &&
         v.account !== null &&
         v.account.bank !== null &&

@@ -1,5 +1,5 @@
 <template>
-  <v-layout column>
+  <v-layout column >
     <v-flex xs6 offset-xs3>
       <panel title="Login">
         <v-text-field
@@ -14,6 +14,17 @@
         ></v-text-field>
         <br>
         <div class="danger-alert" v-html="error" />
+        <v-snackbar
+          class="error-alert"
+          :timeout="60000"
+          top="top"
+          color="error"
+          :vertical=true
+          v-model="errorAlert"
+    >
+      {{error}}
+       <v-btn dark flat @click.native="errorAlert = false">Close</v-btn>
+         </v-snackbar>
         <br>
         <v-btn
           dark
@@ -34,11 +45,13 @@ export default {
     return {
       username: '',
       password: '',
-      error: null
+      error: null,
+      errorAlert: false
     }
   },
   methods: {
     async login () {
+      this.error = null
       try {
         const response = await AuthenticationService.login({
           username: this.username,
@@ -51,6 +64,7 @@ export default {
         })
       } catch (error) {
         this.error = error.response.data.error
+        this.errorAlert = true
       }
     }
   },
@@ -58,6 +72,7 @@ export default {
     this.$store.state.isUserLoggedIn = false
     this.$store.dispatch('setToken', null)
     this.$store.dispatch('setUser', null)
+    this.$store.dispatch('setAdmin', null)
   }
 }
 </script>

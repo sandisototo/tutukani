@@ -47,12 +47,18 @@ module.exports = (sequelize, DataTypes) => {
     level: {
       type: DataTypes.INTEGER,
       defaultValue: 1
+    },
+    eligible: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
-  }, {
+  },
+  {
     hooks: {
       beforeUpdate: hashPassword,
       beforeSave: hashPassword
-    }
+    },
+    timestamps: true
   })
 
   User.prototype.comparePassword = function (password) {

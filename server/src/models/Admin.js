@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
               beforeCreate: hashPassword,
               beforeUpdate: hashPassword,
               beforeSave: hashPassword
-            }
+          },
+          timestamps: true
         })
 
     Admin.associate = function (models) {}

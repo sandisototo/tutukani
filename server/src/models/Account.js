@@ -26,6 +26,8 @@ module.exports = (sequelize, DataTypes) => {
           branch_code: {
             type: DataTypes.STRING,
           }
+      },{
+      timestamps: true
     })
 
     Account.associate = function (models) {
