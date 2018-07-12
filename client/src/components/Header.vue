@@ -1,13 +1,13 @@
 <template>
-  <v-toolbar fixed class="cyan" dark>
+  <v-toolbar fixed class="light-green darken-1" dark>
     <v-toolbar-title class="mr-4">
       <router-link 
         class="home"
         tag="span"
         :to="{
-          name: 'songs'
+          name: 'my-account'
         }">
-        TabTracker
+        Tutukani
       </router-link>
     </v-toolbar-title>
 
@@ -16,13 +16,20 @@
         flat 
         dark
         :to="{
-          name: 'songs'
+          name: 'my-account'
         }">
-        Browse
+        How it works
       </v-btn>
     </v-toolbar-items>
-
-    <v-spacer></v-spacer>
+    <v-spacer/>
+    <v-spacer>
+      <p class="headline font-weight 400" v-if="$store.state.isUserLoggedIn">
+        Welcome
+        <v-avatar color="indigo">
+      <v-icon dark>account_circle</v-icon>
+    </v-avatar> <span style="font-size:15px;">{{$store.state.user.name}} {{$store.state.user.surname}},   you are on level <b>{{$store.state.user.level}}</b></span>
+      </p>
+    </v-spacer>
 
     <v-toolbar-items>
       <v-btn 
@@ -63,7 +70,7 @@ export default {
       this.$store.dispatch('setToken', null)
       this.$store.dispatch('setUser', null)
       this.$router.push({
-        name: 'songs'
+        name: 'login'
       })
     }
   }
@@ -76,6 +83,6 @@ export default {
 }
 
 .home:hover {
-  color: #E9E;
+  color: #1B5E20;
 }
 </style>

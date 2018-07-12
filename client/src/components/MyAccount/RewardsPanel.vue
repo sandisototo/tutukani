@@ -1,5 +1,5 @@
 <template>
-  <panel title="Bookmarks">
+  <panel title="Your rewards">
     <v-data-table
       :headers="headers"
       :pagination.sync="pagination"
@@ -18,19 +18,19 @@
 
 <script>
 import {mapState} from 'vuex'
-import BookmarksService from '@/services/BookmarksService'
+import RewardsTransactionService from '@/services/RewardsTransactionService'
 
 export default {
   data () {
     return {
       headers: [
         {
-          text: 'Title',
-          value: 'title'
+          text: 'Name',
+          value: ''
         },
         {
-          text: 'Artist',
-          value: 'artist'
+          text: 'Amount',
+          value: ''
         }
       ],
       pagination: {
@@ -48,7 +48,7 @@ export default {
   },
   async mounted () {
     if (this.isUserLoggedIn) {
-      this.bookmarks = (await BookmarksService.index()).data
+      this.rewards = (await RewardsTransactionService.index()).data
     }
   }
 }

@@ -1,4 +1,5 @@
-const {User} = require('../models')
+const { User } = require('../models')
+const { Account } = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
 
@@ -10,39 +11,58 @@ function jwtSignUser (user) {
 }
 
 module.exports = {
-  async register (req, res) {
+  async register(req, res) {
     try {
-      const user = await User.create(req.body)
-      const userJson = user.toJSON()
-      res.send({
-        user: userJson,
-        token: jwtSignUser(userJson)
-      })
+      const { body } = req
+      const user = await User.create(body)
+        .then(async (newUser) => {
+          const account = await newUser.createAccount(body.account)
+          const userJson = newUser.toJSON()
+          userJson['Account'] = account
+          return  userJson  
+        }).then((newUserAccount) => { 
+          res.json({
+            user: newUserAccount,
+            token: jwtSignUser(newUserAccount)
+          })
+        })
     } catch (err) {
+      console.log('err--->', err)
+      const error = (err && err.name == 'SequelizeUniqueConstraintError') ?
+        'Your cell number or email has been used to register here before.' :
+        'Something went wrong!'
+      
       res.status(400).send({
-        error: 'This email account is already in use.'
+        error
       })
     }
   },
-  async login (req, res) {
+  async login(req, res) {
     try {
-      const {email, password} = req.body
+      const {username, password} = req.body
       const user = await User.findOne({
         where: {
-          email: email
-        }
+          username
+        },
+        include: [
+          {
+            model: Account
+          }
+        ]
       })
+
+      console.log('user--->', user)
 
       if (!user) {
         return res.status(403).send({
-          error: 'The login information was incorrect'
+          error: 'User not found. Please sign up first.'
         })
       }
 
       const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) {
         return res.status(403).send({
-          error: 'The login information was incorrect'
+          error: 'The password is incorrect'
         })
       }
 
