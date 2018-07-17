@@ -49,6 +49,7 @@
         <td class="text-xs-right">{{ props.item.level }}</td>
         <td>
           <v-checkbox
+            :disabled="props.item.hasPaidBefore"
             primary
             hide-details
             v-model="props.item.eligible"
@@ -74,9 +75,16 @@ export default {
         this.error = error.response.data.error
       }
     },
-    eligibleToggle (selectedRow) {
+    async eligibleToggle (selectedRow) {
       const eligibility = selectedRow.eligible ? parseInt(1) : parseInt(0)
-      console.log('seligibility-->', eligibility)
+      try {
+        const updateddata = await UsersService.put(selectedRow)
+        console.log('updateddata -->', updateddata)
+        console.log('selectedRow-->', selectedRow)
+        console.log('eligibility-->', eligibility)
+      } catch (err) {
+        console.log(err)
+      }
     }
   },
   data () {

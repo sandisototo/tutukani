@@ -19,9 +19,7 @@ const Op = require('Sequelize').Op;
           }
         })
         if (!donation) {
-          return res.status(404).send({
-            error: 'You have no active donation'
-          })
+          return []
         }
         const candidate = await User.findOne({
           UserId: donation.candidateId,
@@ -53,7 +51,6 @@ const Op = require('Sequelize').Op;
     },
     async post (req, res) {
       try {
-        const userId = req.user.id
         const {body} = req
         const donation = await DonationTransaction.create(body)
         res.send(donation)

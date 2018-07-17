@@ -49,8 +49,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 1
     },
     eligible: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    hasPaidBefore: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {
