@@ -1,4 +1,4 @@
-# Tab Tracker
+# Tutukani
 Tutukani Donation Vue.js / Express.js project that allows user of the same group level to donate to money each other
 # Setup
 
