@@ -1,4 +1,4 @@
-const { User,Admin } = require('../models')
+const { User,Admin,Refeer } = require('../models')
 const { Account } = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
@@ -23,6 +23,20 @@ module.exports = {
           const account = await newUser.createAccount(body.account)
           const userJson = newUser.toJSON()
           userJson['Account'] = account
+          if(typeof body.cell_number != 'undefined'){
+              const  refuser = await User.findOne({
+                  where: {
+                    cell_number:body.cell_number
+                  }})
+              
+             if(refuser){
+                const rfuser = refuser.toJSON()
+                 const link = await Refeer.create({
+                  userid:userJson['id'],
+                  refeer_userid:rfuser['id'] 
+               })
+             }
+          }
           return  userJson  
         }).then((newUserAccount) => { 
           res.json({
