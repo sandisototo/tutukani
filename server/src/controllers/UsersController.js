@@ -57,6 +57,31 @@ const Op = require('Sequelize').Op;
             error: 'not yet implemented!'
         })
     },
+    async linkUser (req, res) {
+       try {
+        const ref = req.body
+       const user = await User.findOne({
+          where: {
+            cell_number: ref.cell_number
+          }
+        })
+       if(user){
+          const link = await user.createReferee({new_member_id:req.user.id})
+          res.json(req.body)
+       }else{
+         res.status(500).send({
+          error: 'user not found with the provided cell number'
+        })
+       }
+        
+
+      } catch (err) {
+        console.log(err)
+        res.status(500).send({
+          error: 'an error has occured trying to link this user record'
+        })
+      }
+    },
     async put(req, res) {
       try {
         const user = req.body

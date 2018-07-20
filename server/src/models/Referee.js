@@ -1,16 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
-    const Refeer = sequelize.define('Refeer',
+    const Referee = sequelize.define('Referee',
     {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
           },
-          userid: {
-           allowNull: false,
-           type: DataTypes.INTEGER,
-          },
-           refeer_userid: {
+          new_member_id: {
            allowNull: false,
            type: DataTypes.INTEGER,
          },
@@ -19,8 +15,10 @@ module.exports = (sequelize, DataTypes) => {
           timestamps: true
         })
    
-    Refeer.associate = function (models) {}
+    Referee.associate = function (models) {
+       Referee.belongsTo(models.User)
+    }
   
-    return Refeer
+    return Referee
   }
   

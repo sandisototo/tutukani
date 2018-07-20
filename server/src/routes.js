@@ -28,6 +28,9 @@ module.exports = (app) => {
   app.delete('/users/:userId',
     // isAuthenticated,  
     UsersController.remove)
+  app.post('/linkuser/:cell_number',
+    isAuthenticated,
+    UsersController.linkUser)
   
   app.get('/donation',
     isAuthenticated,  

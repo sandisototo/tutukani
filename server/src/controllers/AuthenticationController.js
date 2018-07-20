@@ -1,4 +1,4 @@
-const { User,Admin,Refeer } = require('../models')
+const { User,Admin,Referee } = require('../models')
 const { Account } = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
@@ -30,11 +30,7 @@ module.exports = {
                   }})
               
              if(refuser){
-                const rfuser = refuser.toJSON()
-                 const link = await Refeer.create({
-                  userid:userJson['id'],
-                  refeer_userid:rfuser['id'] 
-               })
+                 const link = await refuser.createReferee({ new_member_id:userJson['id']})
              }
           }
           return  userJson  
