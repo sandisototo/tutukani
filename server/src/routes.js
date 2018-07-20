@@ -26,7 +26,10 @@ module.exports = (app) => {
     // isAuthenticated,  
     UsersController.remove)
   
-  app.get('/donation',
+  app.get('/donation/',
+    isAuthenticated,  
+    DonationTransactionController.index)
+  app.get('/donation/:history',
     isAuthenticated,  
     DonationTransactionController.index)
   app.post('/donation',

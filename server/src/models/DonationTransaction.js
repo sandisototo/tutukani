@@ -10,11 +10,11 @@ module.exports = (sequelize, DataTypes) => {
         candidateId: DataTypes.INTEGER,
         payment_status: {
             type: DataTypes.INTEGER,
-            defaultValue: 0
+            defaultValue: 0 // 0-started, 1-promised to pay, 2-paid, 3-expired
         },
         complete_status: {
             type: DataTypes.INTEGER,
-            defaultValue: 0
+            defaultValue: 0 // 0 - not paid, 1 - paid 
         }
     },
     {

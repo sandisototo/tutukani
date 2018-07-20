@@ -7,20 +7,23 @@ const _ = require('lodash')
 const Op = require('Sequelize').Op;
   
   module.exports = {
-    async index (req, res) {
+    async index(req, res) {
       try {
         const userId = req.user.id
         const donation = await DonationTransaction.findOne({
           where: {
               UserId: userId,
               payment_status: {
-                [Op.or]: [0, 1]
+                [Op.or]: [0, 1] // New or Promised to pay
               }
           }
         })
-        if (!donation) {
-          return []
+
+        if (!donation || !(req.params.history && req.params.history != typeof 'undefined')) {
+          res.json(donation)
+          return false
         }
+
         const candidate = await User.findOne({
           UserId: donation.candidateId,
           status: 1,
@@ -39,8 +42,12 @@ const Op = require('Sequelize').Op;
         const candidateJson = candidate.toJSON()
         candidateJson['account'] = candidateAccount
         const donationJson = donation.toJSON()
-        donationJson['candidate'] = candidateJson 
-                  
+        donationJson['candidate'] = candidateJson
+
+        if (req.params.history && req.params.history != typeof 'undefined') { 
+          getHistory(userId)
+        }
+                          
         res.json(donationJson)
       } catch (err) {
         res.status(500).send({
@@ -103,3 +110,41 @@ const Op = require('Sequelize').Op;
     }
   }
   
+async function getHistory(UserId) {
+  console.log('UserId-->', UserId)
+  try {
+    const donations = await DonationTransaction.findAll({
+      where: {
+        UserId
+      },
+      payment_status: {
+        [Op.or]: 3 // Paid
+      },
+      attributes: ['candidateId'],
+      limit: 5
+    })
+
+    console.log('donations-->', donations)
+    
+    let candidateIds = []
+    donations.forEach(async (element) => candidateIds.push(element.dataValues.candidateId))
+    console.log('candidateIds-->', candidateIds)
+  
+    const candidates = await User.findOne({
+      where: {
+        id: {
+          [Op.in]: candidateIds
+        }
+      }
+    })
+
+    console.log('candidates-->', candidates)
+    // donations.each((key) => {
+    //   console.log('key-->',key.dataValues)
+    // })
+      
+    return donations
+  } catch (err) {
+      console.log('err-->', err)
+    }
+  }

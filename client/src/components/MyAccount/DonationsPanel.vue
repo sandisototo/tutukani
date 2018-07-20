@@ -153,35 +153,13 @@ export default {
   },
   async mounted () {
     if (this.isUserLoggedIn) {
-      this.donation = (await DonationTransactionService.index()).data
-      this.donation.complete_status = 1
-      if (this.donation || this.donation.payment_status) {
+      this.donation = (await DonationTransactionService.index(true)).data
+      // this.donation.complete_status = 1
+      if (this.donation && this.donation.payment_status) {
         this.confirmaionBtn = this.donation.payment_status === 1 ? 'Pending..' : 'Ok'
       }
 
-      this.previousDonations = [ // TODO: Select from Transactions table
-        {
-          id: 1,
-          userId: 4,
-          createdAt: '13212-1231-12',
-          receiverName: 'Sibongile Menzi',
-          amount: 60
-        },
-        {
-          id: 1,
-          userId: 4,
-          createdAt: '13212-1231-12',
-          receiverName: 'Sibongile Menzi',
-          amount: 60
-        },
-        {
-          id: 1,
-          userId: 4,
-          createdAt: '13212-1231-12',
-          receiverName: 'Sibongile Menzi',
-          amount: 60
-        }
-      ]
+      this.previousDonations = []
     }
   }
 }

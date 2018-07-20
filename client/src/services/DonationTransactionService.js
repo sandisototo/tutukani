@@ -1,8 +1,8 @@
 import Api from '@/services/Api'
 
 export default {
-  index () {
-    return Api().get(`donation`)
+  index (history) {
+    return history ? Api().get(`donation/${history}`) : Api().get(`donation`)
   },
   post (donation) {
     return Api().post('donation', donation)
