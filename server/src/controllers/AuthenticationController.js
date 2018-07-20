@@ -1,17 +1,21 @@
-const { User } = require('../models')
+const { User,Admin } = require('../models')
 const { Account } = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
-
+const { check, validationResult } = require('express-validator/check');
 function jwtSignUser (user) {
   const ONE_WEEK = 60 * 60 * 24 * 7
   return jwt.sign(user, config.authentication.jwtSecret, {
     expiresIn: ONE_WEEK
   })
 }
-
+ 
 module.exports = {
   async register(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+    }
     try {
       const { body } = req
       const user = await User.create(body)
@@ -76,5 +80,45 @@ module.exports = {
         error: 'An error has occured trying to log in'
       })
     }
-  }
+  },
+ async adminlogin(req, res) {
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+    }
+    try {
+      const {username, level, password} = req.body
+      const user = await Admin.findOne({
+        where: {
+          username,
+          level
+        }
+      })
+
+      console.log('user--->', user)
+
+      if (!user) {
+        return res.status(403).send({
+          error: 'User not found. Please sign up first.'
+        })
+      }
+
+      const isPasswordValid = await Admin.comparePassword(password)
+      if (!isPasswordValid) {
+        return res.status(403).send({
+          error: 'The password is incorrect'
+        })
+      }
+
+      const userJson = user.toJSON()
+      res.send({
+        user: userJson,
+        token: jwtSignUser(userJson)
+      })
+    } catch (err) {
+      res.status(500).send({
+        error: 'An error has occured trying to log in'
+      })
+    }
+  },
 }

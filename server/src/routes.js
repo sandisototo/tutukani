@@ -1,5 +1,6 @@
 const AuthenticationController = require('./controllers/AuthenticationController')
 const UsersController = require('./controllers/UsersController')
+const AdminController = require('./controllers/AdminController')
 // const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy') turned off for testing purposes 
 
 const DonationTransactionController = require('./controllers/DonationTransactionController')
@@ -9,10 +10,12 @@ const isAuthenticated = require('./policies/isAuthenticated')
 
 module.exports = (app) => {
   app.post('/register',
+    validate_singup,
     AuthenticationController.register)
+ 
   app.post('/login',
     AuthenticationController.login)
-  
+ 
   app.get('/users/:level',
     // isAuthenticated,
     UsersController.index)
@@ -51,4 +54,18 @@ module.exports = (app) => {
   app.delete('/rewards/:rewardId',
     isAuthenticated,  
     RewardsTransactionController.remove)
+   app.post('/admin-login',
+    validate_admin_login,
+    AuthenticationController.adminlogin)
+  app.post('/admin-add',
+    validate_admin_singup,
+    AdminController.post)
+  app.get('/admins',
+    AdminController.index)
+  app.put('/admin/:adminid',
+    isAuthenticated,   
+    AdminController.put)
+  app.delete('/admin/:adminid',
+    isAuthenticated,  
+    AdminController.remove)
 }
