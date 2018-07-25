@@ -4,7 +4,7 @@ const {
     Admin
   } = require('../models')
 const _ = require('lodash')
-const Op = require('Sequelize').Op;
+const Op = require('sequelize').Op;
 const { check, validationResult } = require('express-validator/check');
   module.exports = {
     async index(req, res) {

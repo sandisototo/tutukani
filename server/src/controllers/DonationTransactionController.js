@@ -4,7 +4,7 @@ const {
     Account
   } = require('../models')
 const _ = require('lodash')
-const Op = require('Sequelize').Op;
+const Op = require('sequelize').Op;
   
   module.exports = {
     async index (req, res) {
