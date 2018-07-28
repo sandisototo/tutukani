@@ -2,6 +2,7 @@ const { User,Account, Admin} = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
 const { validationResult } = require('express-validator/check');
+
 function jwtSignUser (user) {
   const ONE_WEEK = 60 * 60 * 24 * 7
   return jwt.sign(user, config.authentication.jwtSecret, {
@@ -17,6 +18,7 @@ module.exports = {
     }
     try {
       const { body } = req
+
       const newUser = await User.create(body)
       const account = await newUser.createAccount(body.Account)
  
@@ -89,7 +91,6 @@ module.exports = {
           level
         }
       })
-
 
       if (!user) {
         return res.status(403).send({

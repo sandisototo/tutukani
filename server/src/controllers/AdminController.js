@@ -5,8 +5,9 @@ const {
   } = require('../models')
 const _ = require('lodash')
 const Op = require('Sequelize').Op;
-const { check, validationResult } = require('express-validator/check');
-  module.exports = {
+const { check, validationResult } = require('express-validator/check')
+
+module.exports = {
     async index(req, res) {
       const searchLevel = req.params.level
       try {

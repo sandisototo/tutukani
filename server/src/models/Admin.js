@@ -16,21 +16,21 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
           },
-           level: {
+          level: {
             type: DataTypes.INTEGER,
             defaultValue: 1
           },
           password: {
             allowNull: false,
-            type: DataTypes.STRING, 
+            type: DataTypes.STRING
           },
           province: {
             allowNull: false,
-            type: DataTypes.STRING,
+            type: DataTypes.STRING
           }
         },
         {   
-            hooks: {
+          hooks: {
               beforeCreate: hashPassword,
               beforeUpdate: hashPassword,
               beforeSave: hashPassword
