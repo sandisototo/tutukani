@@ -1,5 +1,5 @@
 const {
-    RewardTransaction,
+  DonationTransaction,
     User,
     Account
   } = require('../models')
@@ -8,17 +8,33 @@ const {
   module.exports = {
     async index (req, res) {
       try {
-        const userId = req.user.id
-        const rewards = await RewardTransaction.findAll({
+        const { id, level } = req.user
+        let attributes = [
+          'id',
+          'name',
+          'surname',
+          'cell_number'
+        ]
+
+        const rewards = await DonationTransaction.findAll({
           where: {
-              UserId: userId,
-              payment_status: 3,
-              complete_status: 2
-          }
+            candidateId: id,
+            level
+          },
+          include: [{
+            model: User, 
+            attributes,
+            where: {
+              id: [DonationTransaction.sequelize.literal('DonationTransaction.UserId')]
+            }
+          }],
+          order: [['createdAt', 'DESC']],
+          limit: 2,
         })
-        
+
         res.json(rewards)
       } catch (err) {
+        console.log('err-->', err )
         res.status(500).send({
           error: 'an error has occured trying to fetch your rewards'
         })

@@ -1,13 +1,13 @@
 <template>
     <v-tabs id="mobile-tabs-5" fixed dark centered>
         <v-toolbar class="light-green darken-1" dark>
-            <v-toolbar-title>Donate</v-toolbar-title>
+            <v-toolbar-title> Donate <v-icon>money</v-icon> </v-toolbar-title>
             <v-spacer></v-spacer>
             <v-tabs-bar class="light-green darken-1" slot="extension">
                 <v-tabs-slider class="yellow"></v-tabs-slider>
                 <v-tabs-item href="#tab-1">
-                    <v-icon>hourglass_full</v-icon>
-                    Waiting
+                    <v-icon>hourglass_empty</v-icon>
+                    Active
                 </v-tabs-item>
                 <v-tabs-item href="#tab-2">
                     <v-icon>history</v-icon>
@@ -23,18 +23,6 @@
             <v-tabs-content v-for="i in 3" :key="i" :id="'tab-' + i">
                 <v-card flat>
                     <v-card-text v-if="i===1">
-                        <v-flex xs12 v-if="donation && donation.complete_status === 1">
-                            <p>
-                                <center>Thank you for your donation.... </center>
-                            </p>
-                            <p class="title">
-                                <center> Now it's time to upgrade :)</center>
-                            </p>
-                            <div class="text-xs-center">
-                                <v-btn round dark>Upgrade to level 2</v-btn>
-                            </div>
-                        </v-flex>
-
                         <v-flex xs12 v-if="!donation">
                             <p>
                                 <center>You have not donated yet</center>
@@ -49,7 +37,7 @@
                                 </center>
                             </p>
                         </v-flex>
-                        <v-flex xs12 v-if="donation && donation.complete_status !== 1">
+                                                <v-flex xs12 v-if="donation && donation.payment_status !== 2">
                             <v-card>
                                 <v-card-title primary-title>
                                     <div>
@@ -93,6 +81,26 @@
                                 </v-slide-y-transition>
                             </v-card>
                         </v-flex>
+                        <v-flex xs12 v-if="donation && donation.payment_status === 2">
+                            <p>
+                                <center>Thank you for your donation.... </center>
+                            </p>
+                            <p class="title">
+                                <center> Now it's time to get more money back :)</center>
+                            </p>
+                            <div class="text-xs-center">
+                                <p>Here is your link below: </p>
+                                            <v-flex xs12 sm12x>
+                                                    <v-text-field
+                                                :value="link"
+                                                label="Link"
+                                                readonly
+                                            ></v-text-field>
+                                            </v-flex>
+                                
+                                <small>* Make sure you share it with 2 donators</small>
+                            </div>
+                        </v-flex>
                     </v-card-text>
                     <v-card-text v-if="i===2">
                         <p>
@@ -127,7 +135,8 @@ export default {
       previousDonations: [],
       e1: 'waiting',
       showBankingDetails: false,
-      confirmaionBtn: 'Ok'
+      confirmaionBtn: 'Ok',
+      link: 'http://localhost:8080/#/register/'
     }
   },
   methods: {
@@ -136,9 +145,9 @@ export default {
         this.showBankingDetails = !this.showBankingDetails
         this.donation.payment_status = 1
         const updateddata = await DonationTransactionService.put(this.donation)
-        console.log('updateddata -->', updateddata)
+
         this.donation = updateddata.data
-        console.log('this.donation -->', this.donation)
+
         this.confirmaionBtn = 'Pending..'
       } catch (err) {
         console.log(err)
@@ -153,12 +162,16 @@ export default {
   },
   async mounted () {
     if (this.isUserLoggedIn) {
-      this.donation = (await DonationTransactionService.index(true)).data
-      // this.donation.complete_status = 1
-      if (this.donation && this.donation.payment_status) {
-        this.confirmaionBtn = this.donation.payment_status === 1 ? 'Pending..' : 'Ok'
+      this.donation = (await DonationTransactionService.index()).data
+
+      if (this.donation && this.donation.payment_status === 1) {
+        this.confirmaionBtn = 'Pending..'
       }
 
+      if (this.donation && this.donation.payment_status === 2) {
+        const hash = btoa(this.user.cell_number)
+        this.link = `${this.link}${hash}`
+      }
       this.previousDonations = []
     }
   }

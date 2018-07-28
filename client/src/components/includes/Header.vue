@@ -47,7 +47,8 @@
         flat 
         dark
         :to="{
-          name: 'register'
+          name: 'register',
+          params: { hash: ' ' }
         }">
         Sign Up
       </v-btn>

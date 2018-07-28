@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 0 // 0-started, 1-promised to pay, 2-paid, 3-expired
         },
-        complete_status: {
+        level: {
             type: DataTypes.INTEGER,
-            defaultValue: 0 // 0 - not paid, 1 - paid 
+            defaultValue: 1 // level 1
         }
     },
     {

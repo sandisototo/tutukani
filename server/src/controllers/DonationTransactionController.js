@@ -9,25 +9,25 @@ const Op = require('Sequelize').Op;
   module.exports = {
     async index(req, res) {
       try {
-        const userId = req.user.id
+        const { id, level } = req.user
         const donation = await DonationTransaction.findOne({
           where: {
-              UserId: userId,
-              payment_status: {
-                [Op.or]: [0, 1] // New or Promised to pay
-              }
+            UserId: id,
+            level: level
           }
         })
 
-        if (!donation || !(req.params.history && req.params.history != typeof 'undefined')) {
-          res.json(donation)
+        if (!donation) {
+          res.json(results)
           return false
         }
 
         const candidate = await User.findOne({
-          UserId: donation.candidateId,
-          status: 1,
-          eligible: 1
+          where: {
+            id: donation.candidateId,
+            status: 1,
+            eligible: true
+          }
         })
 
         if (!candidate) {
@@ -36,17 +36,15 @@ const Op = require('Sequelize').Op;
           })
         }
         const candidateAccount = await Account.findOne({
-          UserId: candidate.id
+          where: {
+            UserId: candidate.id
+          }
         })
 
         const candidateJson = candidate.toJSON()
         candidateJson['account'] = candidateAccount
         const donationJson = donation.toJSON()
         donationJson['candidate'] = candidateJson
-
-        if (req.params.history && req.params.history != typeof 'undefined') { 
-          getHistory(userId)
-        }
                           
         res.json(donationJson)
       } catch (err) {
@@ -111,40 +109,40 @@ const Op = require('Sequelize').Op;
   }
   
 async function getHistory(UserId) {
-  console.log('UserId-->', UserId)
   try {
     const donations = await DonationTransaction.findAll({
       where: {
-        UserId
-      },
-      payment_status: {
-        [Op.or]: 3 // Paid
+        UserId,
+        payment_status: {
+          [Op.or]: 3 // Paid
+        }
       },
       attributes: ['candidateId'],
       limit: 5
     })
-
     console.log('donations-->', donations)
-    
     let candidateIds = []
     donations.forEach(async (element) => candidateIds.push(element.dataValues.candidateId))
-    console.log('candidateIds-->', candidateIds)
-  
-    const candidates = await User.findOne({
+
+    const candidates = await User.findAll({
       where: {
         id: {
           [Op.in]: candidateIds
         }
-      }
+      },
+      include: [
+        {
+          model: DonationTransaction
+        }
+      ]
     })
-
     console.log('candidates-->', candidates)
-    // donations.each((key) => {
-    //   console.log('key-->',key.dataValues)
-    // })
-      
     return donations
   } catch (err) {
       console.log('err-->', err)
     }
-  }
+}
+  
+async function mapHistoryResponse(UserId) {
+  getHistory(UserId)
+}

@@ -28,6 +28,29 @@ const Op = require('Sequelize').Op;
         })
       }
     },
+    async getByNumber(req, res) {
+      const { level, cell_number } = req.params
+      try {
+        const user = await User.findOne({
+            where: {
+              level,
+              cell_number,
+              status: 1
+            },
+            include: [
+            {
+              model: Account
+            }
+          ]
+        })
+
+        res.json(user)
+      } catch (err) {
+          res.status(500).send({
+          error: 'an error has occured trying to fetch user for the provided id and level'
+        })
+      }
+    },
     async toDonate(req, res) {
       const searchLevel = req.params.level
       try {
@@ -56,6 +79,31 @@ const Op = require('Sequelize').Op;
         res.status(500).send({
             error: 'not yet implemented!'
         })
+    },
+    async linkUser (req, res) {
+       try {
+        const ref = req.body
+       const user = await User.findOne({
+          where: {
+            cell_number: ref.cell_number
+          }
+        })
+       if(user){
+          const link = await user.createReferral({new_member_id:req.user.id})
+          res.json(req.body)
+       }else{
+         res.status(500).send({
+          error: 'user not found with the provided cell number'
+        })
+       }
+        
+
+      } catch (err) {
+        console.log(err)
+        res.status(500).send({
+          error: 'an error has occured trying to link this user record'
+        })
+      }
     },
     async put(req, res) {
       try {

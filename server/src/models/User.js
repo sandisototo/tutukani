@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
     hasPaidBefore: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    province: {
+      allowNull: false,
+      type: DataTypes.STRING,
     }
   },
   {
@@ -66,8 +70,6 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   User.prototype.comparePassword = function (password) {
-    console.log('password', password)
-    console.log('this.password', this.password)
     return bcrypt.compare(password, this.password)
   }
 

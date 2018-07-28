@@ -11,7 +11,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/register',
+      path: '/register/:hash',
       name: 'register',
       component: RegisterUser
     },
