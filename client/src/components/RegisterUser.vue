@@ -335,7 +335,7 @@
        const hash = this.$route.params.hash
        const cellNumber = this.isBase64(hash) ? atob(hash) : null
 
-       if (cellNumber && cellNumber.length === 4) { // TODO: change this length
+       if (cellNumber) { // TODO: change this length
          const donationCandidate = (await UsersService.getByNumber(1, cellNumber)).data
          this.newDonationTransaction.candidateId = donationCandidate && donationCandidate.id ? donationCandidate.id : null
        } else {
