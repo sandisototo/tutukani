@@ -137,7 +137,7 @@ export default {
       e1: 'waiting',
       showBankingDetails: false,
       confirmaionBtn: 'Ok',
-      link: 'http://localhost:8080/#/register/'
+      link: 'https://tutukani.co.za/#/register/'
     }
   },
   methods: {
