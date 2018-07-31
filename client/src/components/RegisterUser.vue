@@ -236,6 +236,7 @@
          },
          linkingErrorDialog: false,
          linkingErrorDialogMessage: null,
+         donationCandidate: null,
          banks: [
           //  'Absa',
           //  'African Bank',
@@ -313,7 +314,7 @@
 
            // Create link
            const donation = (await DonationTransactionService.post(this.newDonationTransaction)).data
-           console.log('donation--> after reg', donation)
+           console.log('donation-->', donation)
            this.$router.push({
              name: 'my-account'
            })
@@ -327,7 +328,7 @@
      },
      async mounted () {
        let eMsg = null
-       this.reset()
+
        if (!this.$route.params && !this.$route.params.hash) {
          this.closeRegistration()
        }
@@ -335,9 +336,9 @@
        const hash = this.$route.params.hash
        const cellNumber = this.isBase64(hash) ? atob(hash) : null
 
-       if (cellNumber && cellNumber.length === 4) { // TODO: change this length
-         const donationCandidate = (await UsersService.getByNumber(1, cellNumber)).data
-         this.newDonationTransaction.candidateId = donationCandidate && donationCandidate.id ? donationCandidate.id : null
+       if (cellNumber) { // TODO: change this length
+         this.donationCandidate = (await UsersService.getByNumber(1, cellNumber)).data
+         this.newDonationTransaction.candidateId = this.donationCandidate && this.donationCandidate.id ? this.donationCandidate.id : null
        } else {
          eMsg = 'This link is not valid!'
          this.linkingErrorDialogMessage = eMsg
@@ -346,18 +347,16 @@
          return false
        }
 
-       // TODO: check the link count/ number of people registered should not be more than 2
-       /* e.g
-          MyModel.count({
-            include: ...,
-            where: ...,
-            distinct: true,
-            col: 'Product.id'
-          })
-          .then(function(count) {
-              // count is an integer
-          });
-        */
+       // Check the link count/ number of people registered should not be more than 2
+       const donationCount = (await DonationTransactionService.getDonationCount(this.donationCandidate.level, this.donationCandidate.id)).data
+       console.log('donationCount-->', donationCount)
+       if (donationCount > 2) {
+         eMsg = 'This user have 2 donators asigned to them already'
+         this.linkingErrorDialogMessage = eMsg
+         this.linkingErrorDialog = true
+         console.error(eMsg)
+         return false
+       }
 
        if (!this.newDonationTransaction.candidateId) {
          eMsg = 'The user to pay was not found!'

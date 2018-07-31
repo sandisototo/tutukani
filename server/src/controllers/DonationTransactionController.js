@@ -54,6 +54,24 @@ const Op = require('sequelize').Op;
         })
       }
     },
+    async getDonationCount(req, res) { 
+      const { level, candidateId } = req.params
+      try {
+        const count = await DonationTransaction.count({
+          where: {
+            candidateId: candidateId,
+            level: level
+          }
+        })
+
+        res.json(count)
+      } catch (err) {
+        console.log('err -->', err)
+        res.status(500).send({
+          error: 'an error has occured trying to delete the transaction'
+        })
+      }
+    },
     async post (req, res) {
       try {
         const {body} = req
@@ -86,7 +104,7 @@ const Op = require('sequelize').Op;
     async remove (req, res) {
       try {
         const userId = req.user.id
-        const {donationId} = req.params
+        const { donationId } = req.params
         const donation = await DonationTransaction.findOne({
           where: {
             id: donationId,
@@ -108,41 +126,4 @@ const Op = require('sequelize').Op;
     }
   }
   
-async function getHistory(UserId) {
-  try {
-    const donations = await DonationTransaction.findAll({
-      where: {
-        UserId,
-        payment_status: {
-          [Op.or]: 3 // Paid
-        }
-      },
-      attributes: ['candidateId'],
-      limit: 5
-    })
-    console.log('donations-->', donations)
-    let candidateIds = []
-    donations.forEach(async (element) => candidateIds.push(element.dataValues.candidateId))
-
-    const candidates = await User.findAll({
-      where: {
-        id: {
-          [Op.in]: candidateIds
-        }
-      },
-      include: [
-        {
-          model: DonationTransaction
-        }
-      ]
-    })
-    console.log('candidates-->', candidates)
-    return donations
-  } catch (err) {
-      console.log('err-->', err)
-    }
-}
   
-async function mapHistoryResponse(UserId) {
-  getHistory(UserId)
-}

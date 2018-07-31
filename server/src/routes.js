@@ -41,6 +41,9 @@ module.exports = (app) => {
   app.get('/donation/:history',
     isAuthenticated,  
     DonationTransactionController.index)
+  app.get('/donation/:level/:candidateId',
+    // isAuthenticated,  
+    DonationTransactionController.getDonationCount)
   app.post('/donation',
     isAuthenticated,
     DonationTransactionController.post)
