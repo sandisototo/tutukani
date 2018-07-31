@@ -69,6 +69,7 @@
                                         <br> Bank Holder: {{donation.candidate.account.account_holder}}
                                         <br> Account Type: {{donation.candidate.account.account_type}}
                                         <br> Account Number: {{donation.candidate.account.account_number}}
+                                        <br> Cellphone Banking Number: {{donation.candidate.account.account_cell_number}}
                                         <br>
                                         <p v-show="donation.candidate.account.branch_code !== null">Branch Code: {{donation.candidate.account.branch_code}}</p>
                                         <br>

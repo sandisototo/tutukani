@@ -327,6 +327,7 @@
        }
      },
      async mounted () {
+       this.reset()
        let eMsg = null
 
        if (!this.$route.params && !this.$route.params.hash) {
@@ -350,7 +351,7 @@
        // Check the link count/ number of people registered should not be more than 2
        const donationCount = (await DonationTransactionService.getDonationCount(this.donationCandidate.level, this.donationCandidate.id)).data
        console.log('donationCount-->', donationCount)
-       if (donationCount > 2) {
+       if (donationCount >= 2) {
          eMsg = 'This user have 2 donators asigned to them already'
          this.linkingErrorDialogMessage = eMsg
          this.linkingErrorDialog = true
