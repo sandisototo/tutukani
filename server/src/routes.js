@@ -7,7 +7,7 @@ const DonationTransactionController = require('./controllers/DonationTransaction
 const RewardsTransactionController = require('./controllers/RewardsTransactionController')
 
 const isAuthenticated = require('./policies/isAuthenticated')
-
+const isAuthenticatedAdmin = require('./policies/isAuthenticatedAdmin')
 module.exports = (app) => {
   app.post('/register',
     validate_singup,
@@ -73,11 +73,12 @@ module.exports = (app) => {
     validate_admin_singup,
     AdminController.post)
   app.get('/admins',
+    isAuthenticatedAdmin,
     AdminController.index)
   app.put('/admin/:adminid',
-    isAuthenticated,   
+    isAuthenticatedAdmin,   
     AdminController.put)
   app.delete('/admin/:adminid',
-    isAuthenticated,  
+    isAuthenticatedAdmin,  
     AdminController.remove)
 }
