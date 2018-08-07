@@ -8,8 +8,8 @@ const config = require('./config/config')
 const app = express()
 app.use(morgan('combined'))
 app.use(bodyParser.json())
-app.use(cors())
-
+app.use('*',cors())
+app.use(bodyParser.urlencoded({extended: true}));
 require('./passport')
 
 require('./routes')(app)
