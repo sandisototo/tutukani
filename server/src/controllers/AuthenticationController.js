@@ -84,21 +84,22 @@ module.exports = {
       return res.status(403).json({ 'status': false, errors: errors.mapped() });
     }
     try {
-      const {username, level, password} = req.body
+      const { username, level, password } = req.body
+
       const user = await Admin.findOne({
         where: {
           username,
           level
         }
       })
-
+      
       if (!user) {
         return res.status(403).send({
-          error: 'User not found. Please sign up first.'
+          error: 'User not found. Please ask to be added as admin.'
         })
       }
 
-      const isPasswordValid = await Admin.comparePassword(password)
+      const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) {
         return res.status(403).send({
           error: 'The password is incorrect'
@@ -111,6 +112,7 @@ module.exports = {
         token: jwtSignUser(userJson)
       })
     } catch (err) {
+      console.log('err-->', err)
       res.status(500).send({
         error: 'An error has occured trying to log in'
       })

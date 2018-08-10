@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs')
 const { hashPassword } = require('./../helpers')
 
 module.exports = (sequelize, DataTypes) => {
@@ -31,7 +32,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         {   
           hooks: {
-              beforeCreate: hashPassword,
               beforeUpdate: hashPassword,
               beforeSave: hashPassword
           },

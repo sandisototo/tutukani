@@ -4,6 +4,8 @@ import Router from 'vue-router'
 import RegisterUser from '@/components/RegisterUser'
 import Login from '@/components/Login'
 import MyAccount from '@/components/MyAccount/index'
+
+import AdminLogin from '@/components/Admin/AdminLogin'
 import Dashboard from '@/components/Admin/Dashboard'
 
 Vue.use(Router)
@@ -29,6 +31,11 @@ export default new Router({
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminLogin
     },
     {
       path: '*',

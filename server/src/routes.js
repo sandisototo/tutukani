@@ -8,6 +8,7 @@ const RewardsTransactionController = require('./controllers/RewardsTransactionCo
 
 const isAuthenticated = require('./policies/isAuthenticated')
 const isAuthenticatedAdmin = require('./policies/isAuthenticatedAdmin')
+
 module.exports = (app) => {
   app.post('/register',
     validate_singup,
@@ -66,19 +67,19 @@ module.exports = (app) => {
   app.delete('/rewards/:rewardId',
     isAuthenticated,  
     RewardsTransactionController.remove)
-   app.post('/admin-login',
+   app.post('/adminLogin',
     validate_admin_login,
     AuthenticationController.adminlogin)
-  app.post('/admin-add',
+  app.post('/admin',
     validate_admin_singup,
     AdminController.post)
-  app.get('/admins',
+  app.get('/admin',
     isAuthenticatedAdmin,
     AdminController.index)
-  app.put('/admin/:adminid',
+  app.put('/admin/:adminId',
     isAuthenticatedAdmin,   
     AdminController.put)
-  app.delete('/admin/:adminid',
+  app.delete('/admin/:adminId',
     isAuthenticatedAdmin,  
     AdminController.remove)
 }
