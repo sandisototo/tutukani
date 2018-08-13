@@ -5,11 +5,11 @@ const {
   } = require('../models')
 const _ = require('lodash')
 const Op = require('sequelize').Op;
-const { check, validationResult } = require('express-validator/check')
+const { validationResult } = require('express-validator/check')
 
 module.exports = {
     async index(req, res) {
-      const searchLevel = req.params.level
+      // const searchLevel = req.params.level
       try {
         const admins = await Admin.findAll()
 
@@ -28,7 +28,7 @@ module.exports = {
       
       try {
         const { body } = req
-        const user = await Admin.create(body)
+        await Admin.create(body)
         res.json(req.body)
       } catch (err) {
         console.log('err--->', err)

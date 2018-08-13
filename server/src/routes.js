@@ -67,17 +67,18 @@ module.exports = (app) => {
   app.delete('/rewards/:rewardId',
     isAuthenticated,  
     RewardsTransactionController.remove)
-   app.post('/adminLogin',
+
+  app.get('/admin',
+    // isAuthenticatedAdmin,
+    AdminController.index)
+  app.post('/adminLogin',
     validate_admin_login,
     AuthenticationController.adminlogin)
   app.post('/admin',
     validate_admin_singup,
     AdminController.post)
-  app.get('/admin',
-    isAuthenticatedAdmin,
-    AdminController.index)
   app.put('/admin/:adminId',
-    isAuthenticatedAdmin,   
+    // isAuthenticatedAdmin,   
     AdminController.put)
   app.delete('/admin/:adminId',
     isAuthenticatedAdmin,  

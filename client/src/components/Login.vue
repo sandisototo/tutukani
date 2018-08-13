@@ -1,7 +1,7 @@
 <template>
   <v-layout column >
     <v-flex xs6 offset-xs3>
-      <panel title="Login">
+      <panel title="User Login">
         <v-text-field
           label="Cellphone Number"
           v-model="username"

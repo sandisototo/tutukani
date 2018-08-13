@@ -14,7 +14,7 @@
                             <v-form>
                                 <!-- <v-layout row> -->
                                 <v-flex xs12>
-                                    <h1 class="text-xs-center mb-5">Login</h1>
+                                    <h1 class="text-xs-center mb-5">Admin Login</h1>
                                     <v-text-field name="username" label="Username" v-model="username" type="text" required></v-text-field>
                                 </v-flex>
 

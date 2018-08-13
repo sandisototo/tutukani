@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar fixed class="light-green darken-1" dark>
+  <v-toolbar fixed class="primary" v-bind:class="{ 'light-green darken-1': $route.name !== 'admin' }"  dark v-if="!$store.state.isAdmin">
     <v-toolbar-title class="mr-4">
       <router-link 
         class="home"
@@ -75,7 +75,8 @@ export default {
         name: 'login'
       })
     }
-  }
+  },
+  async mounted () {}
 }
 </script>
 

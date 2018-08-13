@@ -113,8 +113,14 @@ const Op = require('sequelize').Op;
             id: user.id
           }
         })
-        res.json(req.body)
 
+        await Account.update(user.Account, {
+          where: {
+            UserId: user.id
+          }
+        })
+
+        res.json(req.body)
       } catch (err) {
         console.log(err)
         res.status(500).send({
