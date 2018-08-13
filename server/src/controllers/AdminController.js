@@ -9,10 +9,14 @@ const { validationResult } = require('express-validator/check')
 
 module.exports = {
     async index(req, res) {
-      // const searchLevel = req.params.level
       try {
-        const admins = await Admin.findAll()
-
+        const admins = await Admin.findAll({
+          attributes:{
+            exclude:[
+              "password"
+            ]
+          }
+        })
         res.json(admins)
       } catch (err) {
           res.status(500).send({
@@ -29,7 +33,7 @@ module.exports = {
       try {
         const { body } = req
         await Admin.create(body)
-        res.json(req.body)
+        res.json({'status':true, 'body':req.body })
       } catch (err) {
         console.log('err--->', err)
         res.status(400).send({

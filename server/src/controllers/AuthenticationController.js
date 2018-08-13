@@ -85,7 +85,6 @@ module.exports = {
     }
     try {
       const { username, level, password } = req.body
-
       const user = await Admin.findOne({
         where: {
           username,
