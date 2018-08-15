@@ -1,10 +1,7 @@
 const {
-  User,
-  Account,
-  Admin
-} = require('../models')
+    Admin
+  } = require('../models')
 const _ = require('lodash')
-const Op = require('sequelize').Op;
 const { validationResult } = require('express-validator/check')
 
 module.exports = {
@@ -19,21 +16,22 @@ module.exports = {
       })
       res.json(admins)
     } catch (err) {
-      res.status(500).send({
+        res.status(500).send({
         error: 'an error has occurred trying to fetch admins for this level'
       })
     }
   },
-  async post(req, res) {
+  async post (req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(403).json({ 'status': false, errors: errors.mapped() });
     }
-
+    
     try {
       const { body } = req
       await Admin.create(body)
-      res.json({ 'status': true, 'body': req.body })
+
+      res.json(req.body)
     } catch (err) {
       console.log('err--->', err)
       res.status(400).send({
@@ -49,8 +47,8 @@ module.exports = {
           id: admin.id
         }
       })
-      res.json(req.body)
 
+      res.json(req.body)
     } catch (err) {
       console.log(err)
       res.status(500).send({

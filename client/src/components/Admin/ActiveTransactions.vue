@@ -207,7 +207,9 @@ export default {
   computed: {
     ...mapState(['isAdmin', 'admin'])
   },
-  async mounted () {}
+  async mounted () {
+    // call getActiveDonations
+  }
 }
 </script>
 <style>
