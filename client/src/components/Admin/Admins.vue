@@ -34,7 +34,7 @@
       </template>
       <template slot="items" slot-scope="props">
         <td>{{ props.item.name }} {{ props.item.surname }}</td>
-        <td>{{ props.item.province }} {{ props.item.province }}</td>
+        <td>{{ props.item.province }}</td>
         <td class="text-xs-right">{{ props.item.level }}</td>
         <td>
           <center>
@@ -72,7 +72,7 @@
                                  <v-text-field v-model="selectedAdmin.username" prepend-icon="perm_identity" placeholder="Username" required></v-text-field>
                              </v-flex>
                                   <v-flex xs6>
-                            <v-text-field v-model="selectedAdmin.password" prepend-icon="lock" type="password" placeholder="Password" required></v-text-field>
+                            <v-text-field prepend-icon="lock" type="password" placeholder="Password - Can't be changed" disabled></v-text-field>
                                   </v-flex>
                             </v-layout>
                         </v-flex>
