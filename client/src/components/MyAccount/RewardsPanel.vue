@@ -78,12 +78,12 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
-import RewardsTransactionService from '@/services/RewardsTransactionService'
-import DonationTransactionService from '@/services/DonationTransactionService'
+import { mapState } from 'vuex';
+import RewardsTransactionService from '@/services/RewardsTransactionService';
+import DonationTransactionService from '@/services/DonationTransactionService';
 
 export default {
-  data () {
+  data() {
     return {
       headers: [
         {
@@ -113,35 +113,28 @@ export default {
       },
       loading: false,
       rewards: []
-    }
+    };
   },
   methods: {
-    async gotIt (reward) {
+    async gotIt(reward) {
       try {
-        this.loading = true
-        reward.payment_status = 2
-        await DonationTransactionService.put(reward)
-        this.loading = false
+        this.loading = true;
+        reward.payment_status = 2;
+        await DonationTransactionService.put(reward);
+        this.loading = false;
       } catch (err) {
-        this.loading = false
-        console.log(err)
+        this.loading = false;
+        console.log(err);
       }
     }
   },
   computed: {
-    ...mapState([
-      'isUserLoggedIn',
-      'user'
-    ])
+    ...mapState(['isUserLoggedIn', 'user'])
   },
-  async mounted () {
+  async mounted() {
     if (this.isUserLoggedIn) {
-      this.rewards = (await RewardsTransactionService.index()).data
+      this.rewards = (await RewardsTransactionService.index()).data;
     }
   }
-}
+};
 </script>
-
-<style>
-
-</style>
