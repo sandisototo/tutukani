@@ -4,28 +4,30 @@ const {
     Account
   } = require('../models')
 const _ = require('lodash')
-const Op = require('Sequelize').Op;
+const Op = require('sequelize').Op;
   
   module.exports = {
-    async index (req, res) {
+    async index(req, res) {
       try {
-        const userId = req.user.id
+        const { id, level } = req.user
         const donation = await DonationTransaction.findOne({
           where: {
-              UserId: userId,
-              payment_status: {
-                [Op.or]: [0, 1]
-              }
+            UserId: id,
+            level: level
           }
         })
+
         if (!donation) {
-          return res.status(404).send({
-            error: 'You have no active donation'
-          })
+          res.json(results)
+          return false
         }
+
         const candidate = await User.findOne({
-          UserId: donation.candidateId,
-          status: 1
+          where: {
+            id: donation.candidateId,
+            status: 1,
+            eligible: true
+          }
         })
 
         if (!candidate) {
@@ -34,24 +36,44 @@ const Op = require('Sequelize').Op;
           })
         }
         const candidateAccount = await Account.findOne({
-          UserId: candidate.id
+          where: {
+            UserId: candidate.id
+          }
         })
 
         const candidateJson = candidate.toJSON()
         candidateJson['account'] = candidateAccount
         const donationJson = donation.toJSON()
-        donationJson['candidate'] = candidateJson 
-                  
+        donationJson['candidate'] = candidateJson
+                          
         res.json(donationJson)
       } catch (err) {
         res.status(500).send({
-          error: 'an error has occured trying to fetch relevant donation candidate 2'
+          err,
+          error: 'an error has occured trying to fetch relevant donation candidate'
+        })
+      }
+    },
+    async getDonationCount(req, res) { 
+      const { level, candidateId } = req.params
+      try {
+        const count = await DonationTransaction.count({
+          where: {
+            candidateId: candidateId,
+            level: level
+          }
+        })
+
+        res.json(count)
+      } catch (err) {
+        console.log('err -->', err)
+        res.status(500).send({
+          error: 'an error has occured trying to delete the transaction'
         })
       }
     },
     async post (req, res) {
       try {
-        const userId = req.user.id
         const {body} = req
         const donation = await DonationTransaction.create(body)
         res.send(donation)
@@ -82,7 +104,7 @@ const Op = require('Sequelize').Op;
     async remove (req, res) {
       try {
         const userId = req.user.id
-        const {donationId} = req.params
+        const { donationId } = req.params
         const donation = await DonationTransaction.findOne({
           where: {
             id: donationId,
@@ -103,4 +125,5 @@ const Op = require('Sequelize').Op;
       }
     }
   }
+  
   

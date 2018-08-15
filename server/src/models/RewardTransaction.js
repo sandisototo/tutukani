@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 0
         }
-    })
+        },{
+            timestamps: true
+        }
+    )
 
     RewardTransaction.associate = function (models) {
         RewardTransaction.belongsTo(models.User)

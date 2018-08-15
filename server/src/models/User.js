@@ -47,17 +47,29 @@ module.exports = (sequelize, DataTypes) => {
     level: {
       type: DataTypes.INTEGER,
       defaultValue: 1
+    },
+    eligible: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    hasPaidBefore: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    province: {
+      allowNull: false,
+      type: DataTypes.STRING,
     }
-  }, {
+  },
+  {
     hooks: {
       beforeUpdate: hashPassword,
       beforeSave: hashPassword
-    }
+    },
+    timestamps: true
   })
 
   User.prototype.comparePassword = function (password) {
-    console.log('password', password)
-    console.log('this.password', this.password)
     return bcrypt.compare(password, this.password)
   }
 
