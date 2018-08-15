@@ -58,7 +58,7 @@
             <v-btn icon>
                 <v-icon>notifications</v-icon>
             </v-btn>
-            <v-btn class="primary">
+            <v-btn class="primary" @click="logout">
                 Logout
             </v-btn>
         </v-toolbar>
@@ -158,6 +158,13 @@ export default {
     Settings
   },
   methods: {
+    logout () {
+      this.$store.dispatch('setToken', null)
+      this.$store.dispatch('setAdmin', null)
+      this.$router.push({
+        name: 'admin'
+      })
+    },
     addAdmin () {
       this.dialog = !this.dialog
     },

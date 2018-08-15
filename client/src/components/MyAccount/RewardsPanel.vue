@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import RewardsTransactionService from '@/services/RewardsTransactionService'
 import DonationTransactionService from '@/services/DonationTransactionService'
 
@@ -129,10 +129,7 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      'isUserLoggedIn',
-      'user'
-    ])
+    ...mapState(['isUserLoggedIn', 'user'])
   },
   async mounted () {
     if (this.isUserLoggedIn) {
@@ -141,7 +138,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>
