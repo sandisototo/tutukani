@@ -46,3 +46,8 @@ global.validate_admin_login =[
     check('password')
     .exists().withMessage('passwords field is required'),
 ]
+global.validate_admin_donations =[
+    check('level')
+    .exists().withMessage('level field is required'),
+
+]

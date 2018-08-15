@@ -71,6 +71,10 @@ module.exports = (app) => {
   app.get('/admin',
     isAuthenticatedAdmin,
     AdminController.index)
+   app.post('/admin_donations',
+    isAuthenticatedAdmin,
+    validate_admin_donations,
+    AdminController.donations)
   app.post('/adminLogin',
     validate_admin_login,
     AuthenticationController.adminlogin)
