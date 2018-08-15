@@ -112,12 +112,10 @@
                     v-model="selectedUser.cell_number"
                     ></v-text-field>
                   <v-text-field
+                  disabled
                     label="Password"
-                    placeholder="no spaces allowed"
+                    placeholder="Can't be changed"
                     type="password"
-                    required
-                    :rules="[required]"
-                    v-model="selectedUser.password"
                     ></v-text-field>
                   <v-text-field
                     label="Email"

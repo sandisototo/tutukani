@@ -58,10 +58,8 @@
             <v-btn icon>
                 <v-icon>notifications</v-icon>
             </v-btn>
-            <v-btn icon large>
-                <v-icon size="32px" tile>
-                    account_circle
-                </v-icon>
+            <v-btn class="primary">
+                Logout
             </v-btn>
         </v-toolbar>
         <v-content>

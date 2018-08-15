@@ -13,7 +13,7 @@ module.exports = {
         const admins = await Admin.findAll({
           attributes:{
             exclude:[
-              "password"
+              'password'
             ]
           }
         })
