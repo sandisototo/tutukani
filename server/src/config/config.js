@@ -3,9 +3,9 @@ const path = require('path')
 module.exports = {
   port: process.env.PORT || 8081,
   db: {
-    database: process.env.DB_NAME || 'green-test',
+    database: process.env.DB_NAME || 'tutukani',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASS || '',
+    password: process.env.DB_PASS || 'bqG#ieoZ>5fK',
     options: {
       dialect: process.env.DIALECT || 'mysql',
       host: process.env.HOST || 'localhost',
