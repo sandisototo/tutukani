@@ -124,7 +124,7 @@ module.exports = {
       })
     }
   },
-  async getActiveDonations(req, res) {
+  async getCompletedDonationsByLevel(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(403).json({ 'status': false, errors: errors.mapped() });
@@ -134,6 +134,45 @@ module.exports = {
       let transactions = await DonationTransaction.findAll({
         where:{
           payment_status: 2,
+          level:req.body.level
+        },
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json(transactions) 
+    } catch (err) {
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
+  },
+  async getActiveDonationsByLevel(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+    }
+
+    try {
+      let transactions = await DonationTransaction.findAll({
+        where:{
           level:req.body.level
         },
         include: [

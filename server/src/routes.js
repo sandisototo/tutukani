@@ -83,7 +83,10 @@ module.exports = (app) => {
   app.delete('/admin/:adminId',
     // isAuthenticatedAdmin,  
     AdminController.remove)
-  app.get('/admin/donations/:level',
+  app.get('/admin/donations/completed/:level',
     // isAuthenticatedAdmin,  
-    DonationTransactionController.getActiveDonations)
+    DonationTransactionController.getCompletedDonationsByLevel)
+  app.get('/admin/donations/active/:level',
+    // isAuthenticatedAdmin,  
+    DonationTransactionController.getActiveDonationsByLevel)
 }

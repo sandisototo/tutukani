@@ -2,17 +2,17 @@
     <v-layout  class="mr-2" column>
         <h2 class="display-1 mb-3">Active Transactions</h2>
           <v-card>
-    <v-card-title>
-      <p>Transactions in progress</p>
-      <v-spacer></v-spacer>
-      <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
-    </v-card-title>
+            <v-card-title>
+              <p>Transactions in progress</p>
+              <v-spacer></v-spacer>
+              <v-text-field
+                v-model="search"
+                append-icon="search"
+                label="Search"
+                single-line
+                hide-details
+              ></v-text-field>
+            </v-card-title>
           
             <v-data-table
                 :headers="headers"
@@ -30,10 +30,10 @@
                         <small> >> </small>
                     </td>
                     <td class="text-xs-left highlight-light-blue">
-                        {{props.item.User.Candidate.name}} {{props.item.User.Candidate.surname}}
+                        {{props.item.Candidate.name}} {{props.item.Candidate.surname}}
                     </td>
                     <td class="text-xs-center highlight-light-blue">
-                        {{props.item.User.Candidate.cell_number}}
+                        {{props.item.Candidate.cell_number}}
                     </td>
                     <td class="text-xs-right">
                         R{{props.item.amount}}
@@ -84,12 +84,11 @@
                     </td>
                 </template>
             </v-data-table>
-            </v-card>
+          </v-card>
     </v-layout>
 </template>
 <script>
 import { mapState } from 'vuex'
-// import RewardsTransactionService from '@/services/RewardsTransactionService'
 import DonationTransactionService from '@/services/DonationTransactionService'
 
 export default {
@@ -110,27 +109,27 @@ export default {
         },
         {
           text: 'Donatated to: (Receiver)',
-          value: '2'
-        },
-        {
-          text: 'Receiver cellphone number:',
           value: '3'
         },
         {
-          text: 'Amount',
+          text: 'Receiver cellphone number:',
           value: '4'
         },
         {
-          text: 'Level',
+          text: 'Amount',
           value: '5'
         },
         {
-          text: 'Status',
+          text: 'Level',
           value: '6'
         },
         {
-          text: 'Action',
+          text: 'Status',
           value: '7'
+        },
+        {
+          text: 'Action',
+          value: '8'
         }
       ],
       pagination: {
@@ -148,12 +147,12 @@ export default {
           User: {
             name: 'User1',
             surname: 'One',
-            cell_number: '0781212122',
-            Candidate: {
-              name: 'Candidate1',
-              surname: 'One',
-              cell_number: '111111111'
-            }
+            cell_number: '0781212122'
+          },
+          Candidate: {
+            name: 'Candidate1',
+            surname: 'One',
+            cell_number: '111111111'
           }
         },
         {
@@ -164,12 +163,12 @@ export default {
           User: {
             name: 'User2',
             surname: 'Two',
-            cell_number: '000000000',
-            Candidate: {
-              name: 'Candidate2',
-              surname: 'Two',
-              cell_number: '555555555'
-            }
+            cell_number: '000000000'
+          },
+          Candidate: {
+            name: 'Candidate2',
+            surname: 'Two',
+            cell_number: '555555555'
           }
         },
         {
@@ -180,12 +179,12 @@ export default {
           User: {
             name: 'User15',
             surname: 'Fifteen',
-            cell_number: '2020202020',
-            Candidate: {
-              name: 'Candidate2',
-              surname: 'Two',
-              cell_number: '555555555'
-            }
+            cell_number: '2020202020'
+          },
+          Candidate: {
+            name: 'Candidate2',
+            surname: 'Two',
+            cell_number: '555555555'
           }
         }
       ]
@@ -202,13 +201,23 @@ export default {
         this.loading = false
         console.log(err)
       }
+    },
+    async getActiveTransactionsByLevel (fetchLevel) {
+      try {
+        const response = (await DonationTransactionService.getActiveDonationsByLevel(fetchLevel)).data
+        const donationsObj = response || response.length ? response : []
+        console.log('donationsObj--->', donationsObj)
+        this.donations = donationsObj
+      } catch (error) {
+        this.error = error.response.data.error
+      }
     }
   },
   computed: {
     ...mapState(['isAdmin', 'admin'])
   },
   async mounted () {
-    // call getActiveDonations
+    this.getActiveTransactionsByLevel(1)
   }
 }
 </script>

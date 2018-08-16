@@ -7,8 +7,11 @@ export default {
   getDonationCount (level, candidateId) {
     return Api().get(`donation/${level}/${candidateId}`)
   },
-  getActiveDonations (level) {
-    return Api().get(`admin/donation/${level}`)
+  getActiveDonationsByLevel (level) {
+    return Api().get(`admin/donations/active/${level}`)
+  },
+  getCompletedDonationsByLevel (level) {
+    return Api().get(`admin/donations/completed/${level}`)
   },
   post (donation) {
     return Api().post('donation', donation)
