@@ -3,7 +3,18 @@
         <h2 class="display-1 mb-3">Active Transactions</h2>
           <v-card>
             <v-card-title>
+              <v-layout column>
               <p>Transactions in progress</p>
+                <v-flex xs6 class="ml-2">
+                  <v-select
+                    v-bind:items="levels"
+                    v-bind:label=level.text
+                    single-line
+                    bottom
+                    @input="getActiveTransactionsByLevel"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -138,55 +149,17 @@ export default {
       },
       loading: false,
       search: '',
-      donations: [
-        {
-          id: 1,
-          amount: '60',
-          level: 1,
-          payment_status: 2,
-          User: {
-            name: 'User1',
-            surname: 'One',
-            cell_number: '0781212122'
-          },
-          Candidate: {
-            name: 'Candidate1',
-            surname: 'One',
-            cell_number: '111111111'
-          }
-        },
-        {
-          id: 2,
-          amount: '60',
-          level: 1,
-          payment_status: 1,
-          User: {
-            name: 'User2',
-            surname: 'Two',
-            cell_number: '000000000'
-          },
-          Candidate: {
-            name: 'Candidate2',
-            surname: 'Two',
-            cell_number: '555555555'
-          }
-        },
-        {
-          id: 3,
-          amount: '400',
-          level: 2,
-          payment_status: 3,
-          User: {
-            name: 'User15',
-            surname: 'Fifteen',
-            cell_number: '2020202020'
-          },
-          Candidate: {
-            name: 'Candidate2',
-            surname: 'Two',
-            cell_number: '555555555'
-          }
-        }
+      donations: [],
+      level: { text: 'Level 1', value: 1 },
+      selectedLevel: null,
+      levels: [
+        { text: 'Level 1', value: 1 },
+        { text: 'Level 2', value: 2 },
+        { text: 'Level 3', value: 3 },
+        { text: 'Level 4', value: 4 },
+        { text: 'Level 5', value: 5 },
+        { text: 'Level 6', value: 6 },
+        { text: 'Level 7', value: 7 }
       ]
     }
   },

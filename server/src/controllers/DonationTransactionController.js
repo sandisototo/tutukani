@@ -3,6 +3,7 @@ const {
   User,
   Account
 } = require('../models')
+const { validationResult } = require('express-validator/check')
 const _ = require('lodash')
 const Op = require('sequelize').Op;
 
@@ -131,10 +132,11 @@ module.exports = {
     }
 
     try {
+      let { level } = req.params
       let transactions = await DonationTransaction.findAll({
         where:{
           payment_status: 2,
-          level:req.body.level
+          level
         },
         include: [
         {
@@ -159,21 +161,23 @@ module.exports = {
 
     res.json(transactions) 
     } catch (err) {
+        console.log('err-->', err)
         res.status(500).send({
-        error: 'an error has occurred trying to fetch active transactions for this level'
+        error: 'an error has occurred trying to fetch transactions for this level'
       })
     }
   },
   async getActiveDonationsByLevel(req, res) {
-    const errors = validationResult(req);
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
     }
 
     try {
+      let { level } = req.params
       let transactions = await DonationTransaction.findAll({
         where:{
-          level:req.body.level
+          level
         },
         include: [
         {
@@ -198,6 +202,7 @@ module.exports = {
 
     res.json(transactions) 
     } catch (err) {
+      console.log('err-->', err)
         res.status(500).send({
         error: 'an error has occurred trying to fetch active transactions for this level'
       })

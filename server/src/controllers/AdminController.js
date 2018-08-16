@@ -24,7 +24,7 @@ module.exports = {
   async post (req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
     }
     
     try {

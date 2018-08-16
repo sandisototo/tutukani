@@ -3,7 +3,19 @@
         <h2 class="display-1 mb-3">Donations</h2>
           <v-card>
             <v-card-title>
+              <v-layout column>
               <p>Most likely completed transactions</p>
+                <v-flex xs6 class="ml-2">
+                  <v-select
+                    v-bind:items="levels"
+                    v-bind:label=level.text
+                    single-line
+                    bottom
+                    @input="getCompletedDonationsByLevel"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+              
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -13,6 +25,7 @@
                 hide-details
               ></v-text-field>
             </v-card-title>
+              <v-spacer></v-spacer>
             <v-data-table
                 :headers="headers"
                 :pagination.sync="pagination"
@@ -74,18 +87,6 @@ import { mapState } from 'vuex'
 import DonationTransactionService from '@/services/DonationTransactionService'
 
 export default {
-  methods: {
-    async getCompletedDonationsByLevel (fetchLevel) {
-      try {
-        const response = (await DonationTransactionService.getActiveDonationsByLevel(fetchLevel)).data
-        const donationsObj = response || response.length ? response : []
-        console.log('donationsObj--->', donationsObj)
-        this.donations = donationsObj
-      } catch (error) {
-        this.error = error.response.data.error
-      }
-    }
-  }
   data () {
     return {
       headers: [
@@ -127,11 +128,33 @@ export default {
         descending: true
       },
       loading: false,
-      search: ''
-      donations: []
+      search: '',
+      donations: [],
+      level: { text: 'Level 1', value: 1 },
+      selectedLevel: null,
+      levels: [
+        { text: 'Level 1', value: 1 },
+        { text: 'Level 2', value: 2 },
+        { text: 'Level 3', value: 3 },
+        { text: 'Level 4', value: 4 },
+        { text: 'Level 5', value: 5 },
+        { text: 'Level 6', value: 6 },
+        { text: 'Level 7', value: 7 }
+      ]
     }
   },
-  methods: {},
+  methods: {
+    async getCompletedDonationsByLevel (fetchLevel) {
+      try {
+        const response = (await DonationTransactionService.getCompletedDonationsByLevel(fetchLevel)).data
+        const donationsObj = response || response.length ? response : []
+        console.log('donationsObj--->', donationsObj)
+        this.donations = donationsObj
+      } catch (error) {
+        this.error = error.response.data.error
+      }
+    }
+  },
   computed: {
     ...mapState(['isAdmin', 'admin'])
   },
