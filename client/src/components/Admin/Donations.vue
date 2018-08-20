@@ -54,6 +54,9 @@
                         {{props.item.User.level}}
                     </td>
                     <td class="text-xs-right">
+                        {{props.item.createdAt | formatDate}}
+                    </td>
+                    <td class="text-xs-right">
                       <p v-if="props.item.payment_status === 0">
                         <v-badge color="grey">
                           <v-icon slot="badge" dark>how_to_reg</v-icon>
@@ -116,6 +119,10 @@ export default {
         },
         {
           text: 'Level',
+          value: ''
+        },
+        {
+          text: 'Date&Time',
           value: ''
         },
         {

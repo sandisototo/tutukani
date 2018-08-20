@@ -52,6 +52,9 @@
                     <td class="text-xs-right">
                         {{props.item.level}}
                     </td>
+                     <td class="text-xs-right">
+                        {{props.item.createdAt | formatDate}}
+                    </td>
                     <td class="text-xs-right">
                     <p v-if="props.item.payment_status === 0">
                       <v-badge color="grey">
@@ -135,12 +138,16 @@ export default {
           value: '6'
         },
         {
-          text: 'Status',
+          text: 'Date&Time',
           value: '7'
         },
         {
-          text: 'Action',
+          text: 'Status',
           value: '8'
+        },
+        {
+          text: 'Action',
+          value: '9'
         }
       ],
       pagination: {
