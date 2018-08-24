@@ -18,7 +18,7 @@ module.exports = {
 
       const rewards = await DonationTransaction.findAll({
         where: {
-          candidateId: id,
+          CandidateId: id,
           level
         },
         include: [{

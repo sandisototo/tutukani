@@ -226,7 +226,7 @@
         },
         newDonationTransaction: {
           UserId: null,
-          candidateId: null,
+          CandidateId: null,
           amount: 60
         },
         linkingErrorDialog: false,
@@ -334,7 +334,14 @@
   
       if (cellNumber) { // TODO: change this length
         this.donationCandidate = (await UsersService.getByNumber(1, cellNumber)).data
-        this.newDonationTransaction.candidateId = this.donationCandidate && this.donationCandidate.id ? this.donationCandidate.id : null
+        if (!this.donationCandidate) {
+          eMsg = 'This link is not valid!'
+          this.linkingErrorDialogMessage = eMsg
+          this.linkingErrorDialog = true
+          console.error(eMsg)
+          return false
+        }
+        this.newDonationTransaction.CandidateId = this.donationCandidate && this.donationCandidate.id ? this.donationCandidate.id : null
       } else {
         eMsg = 'This link is not valid!'
         this.linkingErrorDialogMessage = eMsg
@@ -354,7 +361,7 @@
         return false
       }
   
-      if (!this.newDonationTransaction.candidateId) {
+      if (!this.newDonationTransaction.CandidateId) {
         eMsg = 'The user to pay was not found!'
         this.linkingErrorDialogMessage = eMsg
         this.linkingErrorDialog = true

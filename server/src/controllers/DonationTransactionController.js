@@ -19,18 +19,18 @@ module.exports = {
       })
 
       if (!donation) {
-        res.json(results)
+        res.json(donation)
         return false
       }
-
+      
       const candidate = await User.findOne({
         where: {
-          id: donation.candidateId,
+          id: donation.CandidateId,
           status: 1,
           eligible: true
         }
       })
-
+      console.log('donation.CandidateId-->', donation.CandidateId)
       if (!candidate) {
         return res.status(404).send({
           error: 'The user account associated with your donation candidate might have been removed or suspended.'
@@ -49,6 +49,7 @@ module.exports = {
 
       res.json(donationJson)
     } catch (err) {
+      console.log('err--->', err)
       res.status(500).send({
         err,
         error: 'an error has occurred trying to fetch relevant donation candidate'
@@ -56,11 +57,11 @@ module.exports = {
     }
   },
   async getDonationCount(req, res) {
-    const { level, candidateId } = req.params
+    const { level, CandidateId } = req.params
     try {
       const count = await DonationTransaction.count({
         where: {
-          candidateId: candidateId,
+          CandidateId: CandidateId,
           level: level
         }
       })
@@ -69,7 +70,51 @@ module.exports = {
     } catch (err) {
       console.log('err -->', err)
       res.status(500).send({
-        error: 'an error has occurred trying to delete the transaction'
+        error: 'an error has occurred trying to get the count'
+      })
+    }
+  },
+  async getDonationCandidateByLevel(req, res) {
+    // Make sure to have update a user (level and hasPaidBefore) before hitting this
+    const { id, level } = req.user
+    try {
+      const user = await User.findOne({
+        where: {
+          id: {
+            [Op.ne]: id
+          },
+          level,
+          hasPaidBefore: 1,
+          eligible: true,
+          needsDonors: true
+        }
+      })
+
+      res.json(user)
+    } catch (err) {
+      console.log('err -->', err)
+      res.status(500).send({
+        error: 'an error has occurred trying to getDonationCandidateByLevel'
+      })
+    }
+  },
+  async createDonationTransactionByLevel(req, res) {
+    try {
+      const { body } = req
+      /*
+        body: {
+        UserId: 1,
+        CandidateId,
+        level: 2,
+        amount: 120
+        }
+      */
+      const donation = await DonationTransaction.create(body)
+      res.send(donation)
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'an error has occurred trying to record this transaction'
       })
     }
   },

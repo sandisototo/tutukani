@@ -4,8 +4,8 @@ export default {
   index (history) {
     return history ? Api().get(`donation/${history}`) : Api().get(`donation`)
   },
-  getDonationCount (level, candidateId) {
-    return Api().get(`donation/${level}/${candidateId}`)
+  getDonationCount (level, CandidateId) {
+    return Api().get(`donation/${level}/${CandidateId}`)
   },
   getActiveDonationsByLevel (level) {
     return Api().get(`admin/donations/active/${level}`)

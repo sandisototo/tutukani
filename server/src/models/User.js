@@ -56,6 +56,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    needsDonors: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     province: {
       allowNull: false,
       type: DataTypes.STRING,

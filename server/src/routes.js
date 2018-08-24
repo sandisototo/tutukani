@@ -42,7 +42,7 @@ module.exports = (app) => {
   app.get('/donation/:history',
     isAuthenticated,  
     DonationTransactionController.index)
-  app.get('/donation/:level/:candidateId',
+  app.get('/donation/:level/:CandidateId',
     // isAuthenticated,  
     DonationTransactionController.getDonationCount)
   app.post('/donation',
