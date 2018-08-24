@@ -95,39 +95,39 @@ export default {
       headers: [
         {
           text: 'Donor name',
-          value: ''
+          value: 'User.name'
         },
         {
           text: 'Donor cellphone number',
-          value: ''
+          value: 'User.cell_number'
         },
         {
           text: '',
-          value: '2'
+          value: ''
         },
         {
           text: 'Donatated to: (Receiver)',
-          value: ''
+          value: 'Candidate.name'
         },
         {
           text: 'Receiver cellphone number:',
-          value: ''
+          value: 'Candidate.cell_number'
         },
         {
           text: 'Amount',
-          value: ''
+          value: 'amount'
         },
         {
           text: 'Level',
-          value: ''
+          value: 'level'
         },
         {
           text: 'Date&Time',
-          value: ''
+          value: 'createdAt'
         },
         {
           text: 'Status',
-          value: ''
+          value: 'payment_status'
         }
       ],
       pagination: {
