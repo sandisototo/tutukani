@@ -131,10 +131,21 @@ export default {
   computed: {
     ...mapState(['isUserLoggedIn', 'user'])
   },
-  async mounted () {
-    if (this.isUserLoggedIn) {
-      this.rewards = (await RewardsTransactionService.index()).data
+  watch: {
+    rewards: {
+      handler: function (newVal, oldVal) {
+        console.log('newVal--?', newVal)
+        let isLevelComplete = newVal.filter((a) => a.payment_status === 2).length >= 2 // this 2 varies on levels - needs change
+        console.log('isLevelComplete--?', isLevelComplete)
+        if (isLevelComplete) {
+          // show next level button
+        }
+      },
+      deep: true
     }
+  },
+  async mounted () {
+    this.rewards = (await RewardsTransactionService.index()).data
   }
 }
 </script>
