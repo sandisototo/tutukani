@@ -81,6 +81,7 @@
 import { mapState } from 'vuex'
 import RewardsTransactionService from '@/services/RewardsTransactionService'
 import DonationTransactionService from '@/services/DonationTransactionService'
+import bus from '@/helpers/bus'
 
 export default {
   data () {
@@ -112,7 +113,8 @@ export default {
         descending: true
       },
       loading: false,
-      rewards: []
+      rewards: [],
+      isLevelComplete: false
     }
   },
   methods: {
@@ -133,15 +135,16 @@ export default {
   },
   watch: {
     rewards: {
-      handler: function (newVal, oldVal) {
-        console.log('newVal--?', newVal)
+      handler: (newVal, oldVal) => {
         let isLevelComplete = newVal.filter((a) => a.payment_status === 2).length >= 2 // this 2 varies on levels - needs change
-        console.log('isLevelComplete--?', isLevelComplete)
+
         if (isLevelComplete) {
-          // show next level button
+          bus.$emit('isLevelComplete', isLevelComplete)
+          this.isLevelComplete = true
         }
       },
-      deep: true
+      deep: true,
+      immediate: true
     }
   },
   async mounted () {

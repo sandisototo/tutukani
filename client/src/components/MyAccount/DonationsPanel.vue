@@ -37,7 +37,7 @@
                                 </center>
                             </p>
                         </v-flex>
-                                                <v-flex xs12 v-if="donation && donation.payment_status !== 2">
+                         <v-flex xs12 v-if="donation && donation.payment_status !== 2">
                             <v-card>
                                 <v-card-title primary-title>
                                     <div>
@@ -82,7 +82,7 @@
                                 </v-slide-y-transition>
                             </v-card>
                         </v-flex>
-                        <v-flex xs12 v-if="donation && donation.payment_status === 2">
+                        <v-flex xs12 v-if="(donation && donation.payment_status === 2) && !isLevelComplete">
                             <p>
                                 <center>Thank you for your donation.... </center>
                             </p>
@@ -100,6 +100,18 @@
                                             </v-flex>
                                 
                                 <small>* Make sure you share it with 2 donators</small>
+                            </div>
+                        </v-flex>
+                        <v-flex xs12 v-if="(donation && donation.payment_status === 2) && isLevelComplete">
+                            <p>
+                                <center>Looks like you got money that was due to you on this level.... </center>
+                            </p>
+                            <p class="title">
+                                <center> Now it's time to upgrade to next level :)</center>
+                            </p>
+                            <div class="text-xs-center">
+                                <p>Click on a button below: </p>
+                                <v-btn depressed small class="black" dark >Upgrade</v-btn>                                
                             </div>
                         </v-flex>
                     </v-card-text>
@@ -122,6 +134,7 @@
 <script>
 import {mapState} from 'vuex'
 import DonationTransactionService from '@/services/DonationTransactionService'
+import bus from '@/helpers/bus'
 
 export default {
   data () {
@@ -137,7 +150,8 @@ export default {
       e1: 'waiting',
       showBankingDetails: false,
       confirmaionBtn: 'Ok',
-      link: 'https://tutukani.co.za/#/register/'
+      link: 'https://tutukani.co.za/#/register/',
+      isLevelComplete: false
     }
   },
   methods: {
@@ -161,20 +175,24 @@ export default {
       'user'
     ])
   },
+  created () {
+    bus.$on('isLevelComplete', (isLevelComplete) => {
+      this.isLevelComplete = isLevelComplete
+      console.log('isLevelComplete-->', isLevelComplete)
+    })
+  },
   async mounted () {
-    if (this.isUserLoggedIn) {
-      this.donation = (await DonationTransactionService.index()).data
+    this.donation = (await DonationTransactionService.index()).data
 
-      if (this.donation && this.donation.payment_status === 1) {
-        this.confirmaionBtn = 'Pending..'
-      }
-
-      if (this.donation && this.donation.payment_status === 2) {
-        const hash = btoa(this.user.cell_number)
-        this.link = `${this.link}${hash}`
-      }
-      this.previousDonations = []
+    if (this.donation && this.donation.payment_status === 1) {
+      this.confirmaionBtn = 'Pending..'
     }
+
+    if (this.donation && this.donation.payment_status === 2) {
+      const hash = btoa(this.user.cell_number)
+      this.link = `${this.link}${hash}`
+    }
+    this.previousDonations = [] // needs to be pulled
   }
 }
 </script>
