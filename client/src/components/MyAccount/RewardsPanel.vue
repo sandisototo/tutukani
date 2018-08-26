@@ -136,7 +136,6 @@ export default {
   watch: {
     rewards: {
       handler: function (newVal, oldVal) {
-        console.log('this.user.Level-->', this.user.Level)
         let isLevelComplete = newVal.filter((a) => a.payment_status === 2).length >= this.user.Level.max_donors // this 2 varies on levels - needs change
 
         if (isLevelComplete) {
