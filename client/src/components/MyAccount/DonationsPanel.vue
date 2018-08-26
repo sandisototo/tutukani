@@ -110,8 +110,9 @@
                                 <center> Now it's time to upgrade to next level :)</center>
                             </p>
                             <div class="text-xs-center">
+                                <v-icon x-large color="light-green darken-1">check_circle</v-icon>
                                 <p>Click on a button below: </p>
-                                <v-btn depressed small class="black" dark >Upgrade</v-btn>                                
+                                <v-btn depressed small class="black" dark @click.native="setupNewUserLevel()">Upgrade</v-btn>                                
                             </div>
                         </v-flex>
                     </v-card-text>
@@ -134,6 +135,7 @@
 <script>
 import {mapState} from 'vuex'
 import DonationTransactionService from '@/services/DonationTransactionService'
+import UserService from '@/services/UsersService'
 import bus from '@/helpers/bus'
 
 export default {
@@ -151,7 +153,8 @@ export default {
       showBankingDetails: false,
       confirmaionBtn: 'Ok',
       link: 'https://tutukani.co.za/#/register/',
-      isLevelComplete: false
+      isLevelComplete: false,
+      newLevelDonationCandidate: null
     }
   },
   methods: {
@@ -159,11 +162,31 @@ export default {
       try {
         this.showBankingDetails = !this.showBankingDetails
         this.donation.payment_status = 1
-        const updateddata = await DonationTransactionService.put(this.donation)
-
-        this.donation = updateddata.data
+        const updatedData = (await DonationTransactionService.put(this.donation)).data
+        this.donation = updatedData
 
         this.confirmaionBtn = 'Pending..'
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async updatedUserLevel () {
+      try {
+        let userCopy = Object.assign({}, this.user)
+        userCopy.level = userCopy.level + 1
+
+        const updatedUser = (await UserService.put(userCopy)).data
+        this.donation = null
+        this.$store.dispatch('setUser', updatedUser)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async setupNewUserLevel () {
+      try {
+        await this.updatedUserLevel()
+        this.newLevelDonationCandidate = (await DonationTransactionService.getCandidateByLevel()).data
+        console.log('newLevelDonationCandidate-->', this.newLevelDonationCandidate)
       } catch (err) {
         console.log(err)
       }

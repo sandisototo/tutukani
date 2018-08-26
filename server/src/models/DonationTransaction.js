@@ -22,8 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
     DonationTransaction.associate = function (models) {
         DonationTransaction.belongsTo(models.User)
-        DonationTransaction.belongsTo(models.User,{as: 'Candidate', through:'CandidateId'})
-        
+        DonationTransaction.belongsTo(models.User, { as: 'Candidate', through: 'CandidateId' }) 
     }
   
     return DonationTransaction

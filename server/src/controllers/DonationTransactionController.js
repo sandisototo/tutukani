@@ -1,11 +1,12 @@
 const {
   DonationTransaction,
   User,
-  Account
+  Account,
+  Level
 } = require('../models')
 const { validationResult } = require('express-validator/check')
 const _ = require('lodash')
-const Op = require('sequelize').Op;
+const Op = require('sequelize').Op
 
 module.exports = {
   async index(req, res) {
@@ -30,7 +31,7 @@ module.exports = {
           eligible: true
         }
       })
-      console.log('donation.CandidateId-->', donation.CandidateId)
+
       if (!candidate) {
         return res.status(404).send({
           error: 'The user account associated with your donation candidate might have been removed or suspended.'
@@ -74,23 +75,29 @@ module.exports = {
       })
     }
   },
-  async getDonationCandidateByLevel(req, res) {
+  async getCandidateByLevel(req, res) {
     // Make sure to have update a user (level and hasPaidBefore) before hitting this
     const { id, level } = req.user
     try {
-      const user = await User.findOne({
+      const candidate = await User.findOne({
         where: {
           id: {
             [Op.ne]: id
           },
           level,
-          hasPaidBefore: 1,
+          // hasPaidBefore: 1,
           eligible: true,
           needsDonors: true
-        }
+        },
+        include: [{
+          model: Account
+        },
+        {
+          model: Level
+        }]
       })
 
-      res.json(user)
+      res.json(candidate)
     } catch (err) {
       console.log('err -->', err)
       res.status(500).send({
@@ -186,8 +193,8 @@ module.exports = {
         include: [
         {
           model: User,
-          attributes:{
-            exclude:[
+          attributes: {
+            exclude: [
               'password'
             ]
           }

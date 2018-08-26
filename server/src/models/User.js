@@ -79,6 +79,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = function (models) {
     User.hasOne(models.Account)
+    User.belongsTo(models.Level, { foreignKey: 'level' })
   }
 
   return User
