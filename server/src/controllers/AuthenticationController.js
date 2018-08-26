@@ -1,4 +1,4 @@
-const { User, Account, Admin } = require('../models')
+const { User, Account, Admin, Level} = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
 const { validationResult } = require('express-validator/check');
@@ -49,6 +49,9 @@ module.exports = {
         include: [
           {
             model: Account
+          },
+          {
+            model: Level
           }
         ]
       })
