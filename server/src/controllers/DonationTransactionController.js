@@ -59,11 +59,16 @@ module.exports = {
   },
   async getDonationCount(req, res) {
     const { level, CandidateId } = req.params
+    const { id } = req.user || null
+
     try {
       const count = await DonationTransaction.count({
         where: {
           CandidateId: CandidateId,
-          level: level
+          level: level,
+          UserId: {
+            [Op.ne]: id
+          }
         }
       })
 

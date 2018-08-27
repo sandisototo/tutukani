@@ -45,7 +45,7 @@
                                             <center>You have not donated yet</center>
                                         </p>
                                         <p style="font-size: 18px;">Here is your donation candidate information. Pay <b>R{{donation.amount}}</b> and get
-                                            <b>R 120</b> in return.</p>
+                                            <b>R {{donation.amount * user.Level.max_donors}}</b> in return.</p>
                                         <v-layout row>
                                             <v-flex md1>
                                                 <v-avatar slot="activator" size="36px">
@@ -142,22 +142,38 @@ export default {
   data () {
     return {
       donation: null,
-      newDonationCandidate: {
-        candidate: {
-          name: null,
-          surname: null
-        }
-      },
       previousDonations: [],
       e1: 'waiting',
       showBankingDetails: false,
       confirmaionBtn: 'Ok',
       link: 'https://tutukani.co.za/#/register/',
       isLevelComplete: false,
-      newLevelDonationCandidate: null
+      newLevelDonationCandidate: null,
+      loading: false
     }
   },
   methods: {
+    async getDonation () {
+      try {
+        return (await DonationTransactionService.index()).data
+      } catch (err) {
+        console.log('getDonation::', err)
+      }
+    },
+    async getCandidateByLevel () {
+      try {
+        return (await DonationTransactionService.getCandidateByLevel()).data
+      } catch (err) {
+        console.log('getCandidateByLevel::', err)
+      }
+    },
+    async getDonationCount (level, id) {
+      try {
+        return (await DonationTransactionService.getDonationCount(level, id)).data
+      } catch (err) {
+        console.log('getDonationCount::', err)
+      }
+    },
     async setAsPromisedDonation () {
       try {
         this.showBankingDetails = !this.showBankingDetails
@@ -167,28 +183,51 @@ export default {
 
         this.confirmaionBtn = 'Pending..'
       } catch (err) {
-        console.log(err)
+        console.log('setAsPromisedDonation::', err)
       }
     },
-    async updatedUserLevel () {
-      try {
-        let userCopy = Object.assign({}, this.user)
-        userCopy.level = userCopy.level + 1
-
-        const updatedUser = (await UserService.put(userCopy)).data
-        this.donation = null
-        this.$store.dispatch('setUser', updatedUser)
-      } catch (err) {
-        console.log(err)
-      }
+    userCopy () {
+      return Object.assign({}, this.user)
+    },
+    async updatedUser (userCopy) {
+      const updatedUser = (await UserService.put(userCopy)).data
+      this.$store.dispatch('setUser', updatedUser)
     },
     async setupNewUserLevel () {
       try {
-        await this.updatedUserLevel()
-        this.newLevelDonationCandidate = (await DonationTransactionService.getCandidateByLevel()).data
+        this.loading = true
+
+        const userCopy = this.userCopy()
+        userCopy.level = userCopy.level + 1
+        userCopy.hasPaidBefore = 0
+
+        await this.updatedUser(userCopy)
+
+        this.newLevelDonationCandidate = await this.getCandidateByLevel()
         console.log('newLevelDonationCandidate-->', this.newLevelDonationCandidate)
+        this.donation = null
+        this.loading = false
       } catch (err) {
-        console.log(err)
+        this.loading = false
+        console.log('setupNewUserLevel::', err)
+      }
+    },
+    async addNewDonationTransaction () {
+      try {
+        this.loading = true
+
+        const newDonation = {
+          UserId: this.user.id,
+          CandidateId: this.newLevelDonationCandidate.id,
+          level: this.newLevelDonationCandidate.Level.type,
+          amount: this.newLevelDonationCandidate.Level.amount
+        }
+
+        await DonationTransactionService.post(newDonation)
+        this.loading = false
+      } catch (err) {
+        this.loading = false
+        console.log('addNewDonationTransaction::', err)
       }
     }
   },
@@ -201,12 +240,9 @@ export default {
   created () {
     bus.$on('isLevelComplete', (isLevelComplete) => {
       this.isLevelComplete = isLevelComplete
-      console.log('isLevelComplete-->', isLevelComplete)
     })
   },
   async mounted () {
-    this.donation = (await DonationTransactionService.index()).data
-
     if (this.donation && this.donation.payment_status === 1) {
       this.confirmaionBtn = 'Pending..'
     }
@@ -215,6 +251,27 @@ export default {
       const hash = btoa(this.user.cell_number)
       this.link = `${this.link}${hash}`
     }
+
+    this.newLevelDonationCandidate = await this.getCandidateByLevel()
+    const donationCount = await this.getDonationCount(this.newLevelDonationCandidate.level, this.newLevelDonationCandidate.id)
+    console.log('donationCount-->', donationCount)
+    if (donationCount !== this.newLevelDonationCandidate.Level.max_donors) {
+      if (donationCount === this.newLevelDonationCandidate.Level.max_donors - 1) {
+        // create & update user
+        await this.addNewDonationTransaction()
+        const userCopy = this.userCopy()
+        userCopy.needs_donors = false
+        await this.updatedUser(userCopy)
+      } else {
+        // create
+        await this.addNewDonationTransaction()
+      }
+    }
+
+    this.donation = await this.getDonation()
+
+    console.log('this.newLevelDonationCandidate', this.newLevelDonationCandidate)
+    console.log('donation-->', this.donation)
     this.previousDonations = [] // needs to be pulled
   }
 }

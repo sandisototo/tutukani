@@ -27,7 +27,18 @@
         Welcome
         <v-avatar color="indigo">
       <v-icon dark>account_circle</v-icon>
-    </v-avatar> <span style="font-size:15px;">{{$store.state.user.name}} {{$store.state.user.surname}},   you are on level <b>{{$store.state.user.level}}</b></span>
+    </v-avatar> 
+    <span style="font-size:15px;">{{$store.state.user.name}} {{$store.state.user.surname}},   you are on level 
+      
+          <v-badge>
+      <span slot="badge">{{$store.state.user.level}}</span>
+      <v-icon
+        large
+      >
+        trending_up
+      </v-icon>
+    </v-badge>
+    </span>
       </p>
     </v-spacer>
 
