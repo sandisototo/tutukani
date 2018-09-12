@@ -264,6 +264,97 @@ module.exports = {
         error: 'an error has occurred trying to fetch active transactions for this level'
       })
     }
+  },
+  async getUserTransactionByLevel(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, UserId } = req.params
+      
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          level, 
+          'payment_status':2,
+          UserId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
+  }
+  ,
+  async getCandidateTransactionByLevel(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, CandidateId } = req.params
+      
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          level, 
+          'payment_status':2,
+          CandidateId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
   }
 }
 
