@@ -51,12 +51,12 @@ module.exports = (app) => {
   app.post('/donation',
     isAuthenticated,
     DonationTransactionController.post)
-   app.post('/user/transaction/:level/:UserId',
+   app.post('/previousTransactionsUser/:level/:UserId',
     // isAuthenticated,
-    DonationTransactionController.getUserTransactionByLevel)
-  app.post('/canditate/transaction/:level/:CandidateId',
+    DonationTransactionController.previousTransactionsUser)
+  app.post('/previousTransactionsCandidate/:level/:CandidateId',
     // isAuthenticated,
-    DonationTransactionController.getCandidateTransactionByLevel)
+    DonationTransactionController.previousTransactionsCandidate)
 
   app.put('/donation/:donationId',
     isAuthenticated,   

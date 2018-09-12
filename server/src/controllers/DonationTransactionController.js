@@ -265,7 +265,7 @@ module.exports = {
       })
     }
   },
-  async getUserTransactionByLevel(req, res){
+  async previousTransactionsUser(req, res){
       const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(403).json({ 'status': false, errors: errors.mapped() })
@@ -276,7 +276,9 @@ module.exports = {
       
       let transactions = await DonationTransaction.findAll({
         where:{
-          level, 
+           'level':{
+            [Op.lt]:level
+          },
           'payment_status':2,
           UserId
         },
@@ -311,7 +313,7 @@ module.exports = {
     }
   }
   ,
-  async getCandidateTransactionByLevel(req, res){
+  async previousTransactionsCandidate(req, res){
       const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(403).json({ 'status': false, errors: errors.mapped() })
@@ -319,10 +321,12 @@ module.exports = {
 
     try {
       let { level, CandidateId } = req.params
-      
+      console.log('styate', level)
       let transactions = await DonationTransaction.findAll({
         where:{
-          level, 
+          'level':{
+            [Op.lt]:level
+          },
           'payment_status':2,
           CandidateId
         },
