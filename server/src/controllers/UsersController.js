@@ -113,12 +113,13 @@ module.exports = {
           id: user.id
         }
       })
-
-      await Account.update(user.Account, {
-        where: {
-          UserId: user.id
-        }
-      })
+      if (user && user.Account) {
+        await Account.update(user.Account, {
+          where: {
+            UserId: user.id
+          }
+        })
+      }
 
       res.json(req.body)
     } catch (err) {

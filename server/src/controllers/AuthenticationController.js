@@ -21,9 +21,15 @@ module.exports = {
 
       const newUser = await User.create(body)
       const account = await newUser.createAccount(body.Account)
+      
 
       const userJson = newUser.toJSON()
       userJson['Account'] = account
+      userJson['Level'] = {
+        type: 1,
+        max_donors: 2,
+        amount: 6
+      }
       res.json({
         user: userJson,
         token: jwtSignUser(userJson)

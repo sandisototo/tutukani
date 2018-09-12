@@ -28,8 +28,7 @@ module.exports = {
             id: [DonationTransaction.sequelize.literal('DonationTransaction.UserId')]
           }
         }],
-        order: [['createdAt', 'DESC']],
-        limit: 2,
+        order: [['createdAt', 'DESC']]
       })
 
       res.json(rewards)

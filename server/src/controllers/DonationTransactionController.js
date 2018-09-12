@@ -29,7 +29,8 @@ module.exports = {
           id: donation.CandidateId,
           status: 1,
           eligible: true
-        }
+        },
+        include: [{ model: Level }]
       })
 
       if (!candidate) {
@@ -59,16 +60,31 @@ module.exports = {
   },
   async getDonationCount(req, res) {
     const { level, CandidateId } = req.params
-    const { id } = req.user || null
 
     try {
       const count = await DonationTransaction.count({
         where: {
-          CandidateId: CandidateId,
-          level: level,
-          UserId: {
-            [Op.ne]: id
-          }
+          CandidateId,
+          level
+        }
+      })
+
+      res.json(count)
+    } catch (err) {
+      console.log('err -->', err)
+      res.status(500).send({
+        error: 'an error has occurred trying to get the count'
+      })
+    }
+  },
+  async getMyLevelDonationCount(req, res) {
+    const { id, level } = req.user
+
+    try {
+      const count = await DonationTransaction.count({
+        where: {
+          UserId: id,
+          level
         }
       })
 
@@ -83,6 +99,7 @@ module.exports = {
   async getCandidateByLevel(req, res) {
     // Make sure to have update a user (level and hasPaidBefore) before hitting this
     const { id, level } = req.user
+
     try {
       const candidate = await User.findOne({
         where: {
@@ -90,7 +107,7 @@ module.exports = {
             [Op.ne]: id
           },
           level,
-          // hasPaidBefore: 1,
+          hasPaidBefore: true,
           eligible: true,
           needsDonors: true
         },
@@ -113,14 +130,7 @@ module.exports = {
   async createDonationTransactionByLevel(req, res) {
     try {
       const { body } = req
-      /*
-        body: {
-        UserId: 1,
-        CandidateId,
-        level: 2,
-        amount: 120
-        }
-      */
+
       const donation = await DonationTransaction.create(body)
       res.send(donation)
     } catch (err) {

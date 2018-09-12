@@ -2,7 +2,7 @@
     <v-tabs id="mobile-tabs-5" fixed dark centered>
         <v-toolbar class="light-green darken-1" dark>
             <v-toolbar-title>Rewards <v-icon>card_giftcard</v-icon></v-toolbar-title>
-            <v-spacer></v-spacer>
+            <v-spacer></v-spacer> Reload
             <v-tabs-bar class="light-green darken-1" slot="extension">
                 <v-tabs-slider class="yellow"></v-tabs-slider>
                 <v-tabs-item href="#tab-1">
@@ -81,6 +81,7 @@
 import { mapState } from 'vuex'
 import RewardsTransactionService from '@/services/RewardsTransactionService'
 import DonationTransactionService from '@/services/DonationTransactionService'
+import UserService from '@/services/UsersService'
 import bus from '@/helpers/bus'
 
 export default {
@@ -123,6 +124,14 @@ export default {
         this.loading = true
         reward.payment_status = 2
         await DonationTransactionService.put(reward)
+        if (reward.level !== 1) {
+          const userData = {
+            id: reward.User.id,
+            hasPaidBefore: true,
+            needsDonors: true
+          }
+          await UserService.put(userData)
+        }
         this.loading = false
       } catch (err) {
         this.loading = false

@@ -33,7 +33,16 @@
                                 <center>PLEASE WAIT...
                                     <br/>
                                     <span style="font-size: initial;"> We're still finding a suitable candidate for you.
-                        </span>
+                                </span>
+                                <br/>
+                                <br/>
+                                <v-btn depressed small dark 
+                                    v-if="user.level !== 1"
+                                    @click.native="checkAgain"
+                                    :loading="loading"
+                                    >
+                                    Check Again
+                                </v-btn> 
                                 </center>
                             </p>
                         </v-flex>
@@ -45,7 +54,7 @@
                                             <center>You have not donated yet</center>
                                         </p>
                                         <p style="font-size: 18px;">Here is your donation candidate information. Pay <b>R{{donation.amount}}</b> and get
-                                            <b>R {{donation.amount * user.Level.max_donors}}</b> in return.</p>
+                                            <b>R {{donation.amount * donation.candidate.Level.max_donors}}</b> in return.</p>
                                         <v-layout row>
                                             <v-flex md1>
                                                 <v-avatar slot="activator" size="36px">
@@ -82,7 +91,7 @@
                                 </v-slide-y-transition>
                             </v-card>
                         </v-flex>
-                        <v-flex xs12 v-if="(donation && donation.payment_status === 2) && !isLevelComplete">
+                        <v-flex xs12 v-if="user.level === 1 && (donation && donation.payment_status === 2) && !isLevelComplete">
                             <p>
                                 <center>Thank you for your donation.... </center>
                             </p>
@@ -100,6 +109,18 @@
                                             </v-flex>
                                 
                                 <small>* Make sure you share it with 2 donators</small>
+                            </div>
+                        </v-flex>
+                        <v-flex xs12 v-else-if="user.level !== 1 && (donation && donation.payment_status === 2) && !isLevelComplete">
+                            <p>
+                                <center>Thank you for your donation.... </center>
+                            </p>
+                            <p class="title">
+                                <center> Now it's time to get more money back :)</center>
+                            </p>
+                            <div class="text-xs-center">
+                                <p>Relax.... :) We're still waiting for donors for you </p>
+                                <small>* Keep checking your rewards panel</small>
                             </div>
                         </v-flex>
                         <v-flex xs12 v-if="(donation && donation.payment_status === 2) && isLevelComplete">
@@ -149,7 +170,8 @@ export default {
       link: 'https://tutukani.co.za/#/register/',
       isLevelComplete: false,
       newLevelDonationCandidate: null,
-      loading: false
+      loading: false,
+      loader: null
     }
   },
   methods: {
@@ -167,11 +189,18 @@ export default {
         console.log('getCandidateByLevel::', err)
       }
     },
-    async getDonationCount (level, id) {
+    async getDonationCount (level, CandidateId) {
       try {
-        return (await DonationTransactionService.getDonationCount(level, id)).data
+        return (await DonationTransactionService.getDonationCount(level, CandidateId)).data
       } catch (err) {
         console.log('getDonationCount::', err)
+      }
+    },
+    async getMyLevelDonationCount () {
+      try {
+        return (await DonationTransactionService.getMyLevelDonationCount()).data
+      } catch (err) {
+        console.log('getMyLevelDonationCount::', err)
       }
     },
     async setAsPromisedDonation () {
@@ -199,8 +228,9 @@ export default {
 
         const userCopy = this.userCopy()
         userCopy.level = userCopy.level + 1
-        userCopy.hasPaidBefore = 0
-
+        userCopy.Level = {}
+        userCopy.needsDonors = false
+        userCopy.hasPaidBefore = false
         await this.updatedUser(userCopy)
 
         this.newLevelDonationCandidate = await this.getCandidateByLevel()
@@ -224,10 +254,48 @@ export default {
         }
 
         await DonationTransactionService.post(newDonation)
+        this.donation = null
         this.loading = false
       } catch (err) {
         this.loading = false
         console.log('addNewDonationTransaction::', err)
+      }
+    },
+    async checkAgain () {
+      this.loader = 'loading'
+      this.setNewLevelDonationCandidate()
+    },
+    async setNewLevelDonationCandidate () {
+      // Check if there's existing user who needs donors in this level
+      this.newLevelDonationCandidate = await this.getCandidateByLevel()
+      console.log('newLevelDonationCandidate-->', this.newLevelDonationCandidate)
+      if (!this.newLevelDonationCandidate) return
+
+      // Check if there's no existing transaction for current level or not
+      const myLevelDonationCount = await this.getMyLevelDonationCount(this.newLevelDonationCandidate.Level.type, this.newLevelDonationCandidate.id)
+
+      if (myLevelDonationCount) {
+        this.donation = await this.getDonation()
+        console.log('this.donation-->', this.donation)
+        return
+      }
+
+      const donationCount = await this.getDonationCount(this.newLevelDonationCandidate.Level.type, this.newLevelDonationCandidate.id)
+      console.log('donationCount-->', donationCount)
+      if ((donationCount !== this.newLevelDonationCandidate.Level.max_donors) && this.newLevelDonationCandidate.needsDonors) {
+        if (donationCount === this.newLevelDonationCandidate.Level.max_donors - 1) {
+          // create & update user
+          await this.addNewDonationTransaction()
+
+          this.newLevelDonationCandidate.needsDonors = false
+          await this.updatedUser(this.newLevelDonationCandidate)
+        } else {
+          // create
+          await this.addNewDonationTransaction()
+        }
+
+        this.donation = await this.getDonation()
+        console.log('donation-->', this.donation)
       }
     }
   },
@@ -242,36 +310,34 @@ export default {
       this.isLevelComplete = isLevelComplete
     })
   },
+  watch: {
+    loader () {
+      const l = this.loader
+      this[l] = !this[l]
+
+      setTimeout(() => (this[l] = false), 5000)
+
+      this.loader = null
+    }
+  },
   async mounted () {
+    if (this.user.level === 1) {
+      this.donation = await this.getDonation()
+      console.log('donation-->', this.donation)
+    } else {
+      console.log('this.isLevelComplete-->', this.isLevelComplete)
+      this.setNewLevelDonationCandidate()
+    }
+
     if (this.donation && this.donation.payment_status === 1) {
       this.confirmaionBtn = 'Pending..'
     }
 
-    if (this.donation && this.donation.payment_status === 2) {
+    if (this.donation && (this.user.level === 1 && this.donation.payment_status === 2)) {
       const hash = btoa(this.user.cell_number)
       this.link = `${this.link}${hash}`
     }
 
-    this.newLevelDonationCandidate = await this.getCandidateByLevel()
-    const donationCount = await this.getDonationCount(this.newLevelDonationCandidate.level, this.newLevelDonationCandidate.id)
-    console.log('donationCount-->', donationCount)
-    if (donationCount !== this.newLevelDonationCandidate.Level.max_donors) {
-      if (donationCount === this.newLevelDonationCandidate.Level.max_donors - 1) {
-        // create & update user
-        await this.addNewDonationTransaction()
-        const userCopy = this.userCopy()
-        userCopy.needs_donors = false
-        await this.updatedUser(userCopy)
-      } else {
-        // create
-        await this.addNewDonationTransaction()
-      }
-    }
-
-    this.donation = await this.getDonation()
-
-    console.log('this.newLevelDonationCandidate', this.newLevelDonationCandidate)
-    console.log('donation-->', this.donation)
     this.previousDonations = [] // needs to be pulled
   }
 }
