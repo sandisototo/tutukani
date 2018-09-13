@@ -274,6 +274,101 @@ module.exports = {
         error: 'an error has occurred trying to fetch active transactions for this level'
       })
     }
+  },
+  async previousTransactionsUser(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, UserId } = req.params
+      
+      let transactions = await DonationTransaction.findAll({
+        where:{
+           'level':{
+            [Op.lt]:level
+          },
+          'payment_status':2,
+          UserId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
+  }
+  ,
+  async previousTransactionsCandidate(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, CandidateId } = req.params
+      console.log('styate', level)
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          'level':{
+            [Op.lt]:level
+          },
+          'payment_status':2,
+          CandidateId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
   }
 }
 

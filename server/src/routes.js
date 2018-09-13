@@ -54,6 +54,13 @@ module.exports = (app) => {
   app.post('/donation',
     isAuthenticated,
     DonationTransactionController.post)
+   app.post('/previousTransactionsUser/:level/:UserId',
+    // isAuthenticated,
+    DonationTransactionController.previousTransactionsUser)
+  app.post('/previousTransactionsCandidate/:level/:CandidateId',
+    // isAuthenticated,
+    DonationTransactionController.previousTransactionsCandidate)
+
   app.put('/donation/:donationId',
     isAuthenticated,   
     DonationTransactionController.put)
