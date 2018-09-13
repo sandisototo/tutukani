@@ -37,12 +37,32 @@
                         {{props.item.User.cell_number}}
                       </td>
                       <td class="text-xs-right">
-                        <!--{{props.item.payment_status}}-->
-                        <p v-if="props.item.payment_status === 0">Rigistered</p>
-                        <p v-if="props.item.payment_status === 1">Promised to pay</p>
-                        <p v-if="props.item.payment_status === 2">Completed</p>
-                        <p v-if="props.item.payment_status === 3">Expired</p>
+                        {{props.item.level}}
                       </td>
+                    <td class="text-xs-right">
+                    <p v-if="props.item.payment_status === 0">
+                      <v-badge color="grey">
+                        <v-icon slot="badge" dark>how_to_reg</v-icon>
+                        <span>Rigistered</span>
+                      </v-badge></p>
+                    <p v-if="props.item.payment_status === 1">                      
+                      <v-badge color="orange">
+                        <v-icon slot="badge" dark>schedule</v-icon>
+                        <span>Promised to pay</span>
+                      </v-badge></p>
+                    <p v-if="props.item.payment_status === 2">   
+                      <v-badge color="green">
+                        <v-icon slot="badge" dark>check</v-icon>
+                        <span>Completed</span>
+                      </v-badge>
+                    </p>
+                    <p v-if="props.item.payment_status === 3">
+                      <v-badge color="red">
+                        <v-icon slot="badge" dark>error_outline</v-icon>
+                        <span>Expired</span>
+                      </v-badge>
+                      </p>
+                    </td>
                       <td class="text-xs-right">
                               <v-btn
                               small
@@ -98,6 +118,10 @@ export default {
         },
         {
           text: 'Cell number',
+          value: ''
+        },
+        {
+          text: 'Level',
           value: ''
         },
         {
