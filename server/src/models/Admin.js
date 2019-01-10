@@ -35,10 +35,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         {   
-          hooks: {
-              beforeUpdate: hashPassword,
-              beforeSave: hashPassword
-          },
+          hooks: {},
           timestamps: true
         })
     Admin.prototype.comparePassword = function (password) {

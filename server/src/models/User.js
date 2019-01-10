@@ -66,15 +66,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   },
   {
-    hooks: {
-      beforeUpdate: hashPassword,
-      beforeSave: hashPassword
-    },
+    hooks: {},
     timestamps: true
   })
 
   User.prototype.comparePassword = function (password) {
-    return bcrypt.compare(password, this.password)
+    // return bcrypt.compare(password, this.password)
+    return this.password === password
   }
 
   User.associate = function (models) {

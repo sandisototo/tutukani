@@ -112,10 +112,10 @@
                     v-model="selectedUser.cell_number"
                     ></v-text-field>
                   <v-text-field
-                  disabled
                     label="Password"
-                    placeholder="Can't be changed"
-                    type="password"
+                    placeholder="Enter new password"
+                    type="text"
+                    v-model="newPassword"
                     ></v-text-field>
                   <v-text-field
                     label="Email"
@@ -237,7 +237,15 @@
             </v-layout>
           </v-container>
           <small>*indicates required field</small>
-          <v-snackbar
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="editDialogue = false">Close</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="updateUser(selectedUser)">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+              <v-snackbar
             class="error-alert"
             :timeout="60000"
             top="top"
@@ -259,14 +267,6 @@
             {{successMsg}}
             <v-btn dark flat @click.native="successAlert = false">Close</v-btn>
           </v-snackbar>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="editDialogue = false">Close</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="updateUser(selectedUser)">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     </v-layout>
 </template>
 <script>
@@ -295,7 +295,12 @@ export default {
       this.editDialogue = true
     },
     async updateUser (user) {
+      this.editDialogue = false
       try {
+        if (this.newPassword) {
+          user.password = this.newPassword
+        }
+
         await UsersService.put(user)
         this.successAlert = true
         this.successMsg = 'Yes! all saved and good to go ;)'
@@ -312,6 +317,7 @@ export default {
       errorAlert: false,
       successMsg: null,
       successAlert: false,
+      newPassword: '',
       selectedUser: {
         Account: {}
       },
