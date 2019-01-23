@@ -56,10 +56,15 @@
                         {{props.item.createdAt | formatDate}}
                     </td>
                     <td class="text-xs-right">
-                    <p v-if="props.item.payment_status === 0">
+                    <p v-if="props.item.payment_status === 0  && props.item.User.level === 1" >
                       <v-badge color="grey">
                         <v-icon slot="badge" dark>how_to_reg</v-icon>
                         <span>Rigistered</span>
+                      </v-badge></p>
+                      <p v-if="props.item.payment_status === 0 && props.item.User.level > 1">
+                      <v-badge color="grey">
+                        <v-icon slot="badge" dark>how_to_reg</v-icon>
+                        <span>Upgraded to level {{props.item.User.level}} </span>
                       </v-badge></p>
                     <p v-if="props.item.payment_status === 1">                      
                       <v-badge color="orange">

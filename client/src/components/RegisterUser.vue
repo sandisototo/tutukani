@@ -233,12 +233,12 @@
         linkingErrorDialogMessage: null,
         donationCandidate: null,
         banks: [
-         //  'Absa',
-         //  'African Bank',
-          'Capitec'
-         //  'FNB',
-         //  'Nedbank',
-         //  'Standard Bank'
+          'Absa',
+          'African Bank',
+          'Capitec',
+          'FNB',
+          'Nedbank',
+          'Standard Bank'
         ],
         provinces: [
           'Eastern Cape',

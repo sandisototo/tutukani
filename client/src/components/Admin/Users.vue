@@ -374,12 +374,12 @@ export default {
         'Western Cape'
       ],
       banks: [
-        //  'Absa',
-        //  'African Bank',
-        'Capitec'
-        //  'FNB',
-        //  'Nedbank',
-        //  'Standard Bank'
+        'Absa',
+        'African Bank',
+        'Capitec',
+        'FNB',
+        'Nedbank',
+        'Standard Bank'
       ]
     }
   },
