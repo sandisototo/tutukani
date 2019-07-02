@@ -33,6 +33,8 @@ global.validate_admin_singup =[
     .exists().withMessage('level field is required'),
     check('username')
     .exists().withMessage('Surname field is required'),
+    check('province')
+    .exists().withMessage('Province field is required'),
     check('password')
     .exists().withMessage('passwords field is required'),
 ]
@@ -43,4 +45,9 @@ global.validate_admin_login =[
     .exists().withMessage('level field is required'),
     check('password')
     .exists().withMessage('passwords field is required'),
+]
+global.validate_admin_donations =[
+    check('level')
+    .exists().withMessage('level field is required'),
+
 ]

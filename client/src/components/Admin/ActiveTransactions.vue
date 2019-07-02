@@ -1,21 +1,20 @@
 <template>
     <v-layout  class="mr-2" column>
-        <h2 class="display-1 mb-3">Donations</h2>
+        <h2 class="display-1 mb-3">Active Transactions</h2>
           <v-card>
             <v-card-title>
               <v-layout column>
-              <p>Most likely completed transactions</p>
+              <p>Transactions in progress</p>
                 <v-flex xs6 class="ml-2">
                   <v-select
                     v-bind:items="levels"
                     v-bind:label=level.text
                     single-line
                     bottom
-                    @input="getCompletedDonationsByLevel"
+                    @input="getActiveTransactionsByLevel"
                   ></v-select>
                 </v-flex>
               </v-layout>
-              
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -25,7 +24,7 @@
                 hide-details
               ></v-text-field>
             </v-card-title>
-              <v-spacer></v-spacer>
+          
             <v-data-table
                 :headers="headers"
                 :pagination.sync="pagination"
@@ -41,19 +40,19 @@
                     <td class="text-xs-center">
                         <small> >> </small>
                     </td>
-                    <td class="text-xs-right highlight-light-blue">
+                    <td class="text-xs-left highlight-light-blue">
                         {{props.item.Candidate.name}} {{props.item.Candidate.surname}}
                     </td>
-                    <td class="text-xs-right highlight-light-blue">
+                    <td class="text-xs-center highlight-light-blue">
                         {{props.item.Candidate.cell_number}}
                     </td>
                     <td class="text-xs-right">
                         R{{props.item.amount}}
                     </td>
                     <td class="text-xs-right">
-                        {{props.item.User.level}}
+                        {{props.item.level}}
                     </td>
-                    <td class="text-xs-right">
+                     <td class="text-xs-right">
                         {{props.item.createdAt | formatDate}}
                     </td>
                     <td class="text-xs-right">
@@ -67,23 +66,40 @@
                         <v-icon slot="badge" dark>how_to_reg</v-icon>
                         <span>Upgraded to level {{props.item.User.level}} </span>
                       </v-badge></p>
-                      <p v-if="props.item.payment_status === 1">                      
-                        <v-badge color="orange">
-                          <v-icon slot="badge" dark>schedule</v-icon>
-                          <span>Promised to pay</span>
-                        </v-badge></p>
-                      <p v-if="props.item.payment_status === 2">   
-                        <v-badge color="green">
-                          <v-icon slot="badge" dark>check</v-icon>
-                          <span>Completed</span>
-                        </v-badge>
+                    <p v-if="props.item.payment_status === 1">                      
+                      <v-badge color="orange">
+                        <v-icon slot="badge" dark>schedule</v-icon>
+                        <span>Promised to pay</span>
+                      </v-badge></p>
+                    <p v-if="props.item.payment_status === 2">   
+                      <v-badge color="green">
+                        <v-icon slot="badge" dark>check</v-icon>
+                        <span>Completed</span>
+                      </v-badge>
+                    </p>
+                    <p v-if="props.item.payment_status === 3">
+                      <v-badge color="red">
+                        <v-icon slot="badge" dark>error_outline</v-icon>
+                        <span>Expired</span>
+                      </v-badge>
                       </p>
-                      <p v-if="props.item.payment_status === 3">
-                        <v-badge color="red">
-                          <v-icon slot="badge" dark>error_outline</v-icon>
-                          <span>Expired</span>
-                        </v-badge>
-                      </p>
+                    </td>
+                    <td class="text-xs-right">
+                            <v-btn
+                            small
+                            color="secondary"
+                            :loading="loading"
+                            @click.native="confirmPayment(props.item)"
+                            :disabled="props.item.payment_status === 0 
+                            || props.item.payment_status === 2 
+                            || props.item.payment_status === 3"
+                        >
+                            <i v-if="props.item.payment_status === 0">Waiting...</i>
+                            <i v-if="props.item.payment_status === 1">Confirm</i>
+                            <i v-if="props.item.payment_status === 2">Got it :)</i>
+                            <i v-if="props.item.payment_status === 3">Expired</i>
+
+                        </v-btn>
                     </td>
                 </template>
             </v-data-table>
@@ -133,6 +149,10 @@ export default {
         {
           text: 'Status',
           value: 'payment_status'
+        },
+        {
+          text: 'Action',
+          value: ''
         }
       ],
       pagination: {
@@ -156,9 +176,20 @@ export default {
     }
   },
   methods: {
-    async getCompletedDonationsByLevel (fetchLevel) {
+    async confirmPayment (donation) {
       try {
-        const response = (await DonationTransactionService.getCompletedDonationsByLevel(fetchLevel)).data
+        this.loading = true
+        donation.payment_status = 2
+        await DonationTransactionService.put(donation)
+        this.loading = false
+      } catch (err) {
+        this.loading = false
+        console.log(err)
+      }
+    },
+    async getActiveTransactionsByLevel (fetchLevel) {
+      try {
+        const response = (await DonationTransactionService.getActiveDonationsByLevel(fetchLevel)).data
         const donationsObj = response || response.length ? response : []
         console.log('donationsObj--->', donationsObj)
         this.donations = donationsObj
@@ -171,15 +202,17 @@ export default {
     ...mapState(['isAdmin', 'admin'])
   },
   async mounted () {
-    this.getCompletedDonationsByLevel(1)
+    this.getActiveTransactionsByLevel(1)
   }
 }
 </script>
 <style>
-  .highlight-blue {
-    background: #e4f2ff
-  }
-  .highlight-light-blue {
-    background:#f1f7ff
-  }
+.highlight-blue {
+  background: #e4f2ff
+}
+.highlight-light-blue {
+  background:#f1f7ff
+}
 </style>
+
+                

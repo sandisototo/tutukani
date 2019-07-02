@@ -1,5 +1,7 @@
 # Tutukani
-Tutukani Donation Vue.js / Express.js project that allows user of the same group level to donate to money each other
+
+A Vue.js / Express.js web application for investment/stckvel
+
 # Setup
 
 You need to have Node Js installed: https://nodejs.org/en/

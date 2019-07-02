@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true
         },
         amount: DataTypes.DOUBLE,
-        candidateId: DataTypes.INTEGER,
         payment_status: {
             type: DataTypes.INTEGER,
             defaultValue: 0 // 0-started, 1-promised to pay, 2-paid, 3-expired
@@ -23,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
     DonationTransaction.associate = function (models) {
         DonationTransaction.belongsTo(models.User)
+        DonationTransaction.belongsTo(models.User, { as: 'Candidate', through: 'CandidateId' }) 
     }
   
     return DonationTransaction

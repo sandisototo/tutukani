@@ -1,129 +1,375 @@
 const {
-    DonationTransaction,
-    User,
-    Account
-  } = require('../models')
+  DonationTransaction,
+  User,
+  Account,
+  Level
+} = require('../models')
+const { validationResult } = require('express-validator/check')
 const _ = require('lodash')
-const Op = require('sequelize').Op;
-  
-  module.exports = {
-    async index(req, res) {
-      try {
-        const { id, level } = req.user
-        const donation = await DonationTransaction.findOne({
-          where: {
-            UserId: id,
-            level: level
-          }
-        })
+const Op = require('sequelize').Op
 
-        if (!donation) {
-          res.json(results)
-          return false
+module.exports = {
+  async index(req, res) {
+    try {
+      const { id, level } = req.user
+      const donation = await DonationTransaction.findOne({
+        where: {
+          UserId: id,
+          level: level
         }
+      })
 
-        const candidate = await User.findOne({
-          where: {
-            id: donation.candidateId,
-            status: 1,
-            eligible: true
-          }
+      if (!donation) {
+        res.json(donation)
+        return false
+      }
+      
+      const candidate = await User.findOne({
+        where: {
+          id: donation.CandidateId,
+          status: 1,
+          eligible: true
+        },
+        include: [{ model: Level }]
+      })
+
+      if (!candidate) {
+        return res.status(404).send({
+          error: 'The user account associated with your donation candidate might have been removed or suspended.'
         })
-
-        if (!candidate) {
-          return res.status(404).send({
-            error: 'The user account associated with your donation candidate might have been removed or suspended.'
-          })
+      }
+      const candidateAccount = await Account.findOne({
+        where: {
+          UserId: candidate.id
         }
-        const candidateAccount = await Account.findOne({
-          where: {
-            UserId: candidate.id
-          }
-        })
+      })
 
-        const candidateJson = candidate.toJSON()
-        candidateJson['account'] = candidateAccount
-        const donationJson = donation.toJSON()
-        donationJson['candidate'] = candidateJson
-                          
-        res.json(donationJson)
-      } catch (err) {
-        res.status(500).send({
-          err,
-          error: 'an error has occured trying to fetch relevant donation candidate'
-        })
-      }
-    },
-    async getDonationCount(req, res) { 
-      const { level, candidateId } = req.params
-      try {
-        const count = await DonationTransaction.count({
-          where: {
-            candidateId: candidateId,
-            level: level
-          }
-        })
+      const candidateJson = candidate.toJSON()
+      candidateJson['account'] = candidateAccount
+      const donationJson = donation.toJSON()
+      donationJson['candidate'] = candidateJson
 
-        res.json(count)
-      } catch (err) {
-        console.log('err -->', err)
-        res.status(500).send({
-          error: 'an error has occured trying to delete the transaction'
-        })
-      }
-    },
-    async post (req, res) {
-      try {
-        const {body} = req
-        const donation = await DonationTransaction.create(body)
-        res.send(donation)
-      } catch (err) {
-        console.log(err)
-        res.status(500).send({
-          error: 'an error has occured trying to record this transaction'
-        })
-      }
-    },
-    async put(req, res) {
-      try {
-        const donation = req.body
-        await DonationTransaction.update(donation, {
-          where: {
-            id: donation.id
-          }
-        })
-        res.json(req.body)
+      res.json(donationJson)
+    } catch (err) {
+      console.log('err--->', err)
+      res.status(500).send({
+        err,
+        error: 'an error has occurred trying to fetch relevant donation candidate'
+      })
+    }
+  },
+  async getDonationCount(req, res) {
+    const { level, CandidateId } = req.params
 
-      } catch (err) {
-        console.log(err)
-        res.status(500).send({
-          error: 'an error has occured trying to update this transaction'
-        })
-      }
-    },
-    async remove (req, res) {
-      try {
-        const userId = req.user.id
-        const { donationId } = req.params
-        const donation = await DonationTransaction.findOne({
-          where: {
-            id: donationId,
-            UserId: userId
-          }
-        })
-        if (!donation) {
-          return res.status(403).send({
-            error: 'you do not have access to this transaction'
-          })
+    try {
+      const count = await DonationTransaction.count({
+        where: {
+          CandidateId,
+          level
         }
-        await donation.destroy()
-        res.send(donation)
-      } catch (err) {
-        res.status(500).send({
-          error: 'an error has occured trying to delete the transaction'
+      })
+
+      res.json(count)
+    } catch (err) {
+      console.log('err -->', err)
+      res.status(500).send({
+        error: 'an error has occurred trying to get the count'
+      })
+    }
+  },
+  async getMyLevelDonationCount(req, res) {
+    const { id, level } = req.user
+
+    try {
+      const count = await DonationTransaction.count({
+        where: {
+          UserId: id,
+          level
+        }
+      })
+
+      res.json(count)
+    } catch (err) {
+      console.log('err -->', err)
+      res.status(500).send({
+        error: 'an error has occurred trying to get the count'
+      })
+    }
+  },
+  async getCandidateByLevel(req, res) {
+    // Make sure to have update a user (level and hasPaidBefore) before hitting this
+    const { id, level } = req.user
+
+    try {
+      const candidate = await User.findOne({
+        where: {
+          id: {
+            [Op.ne]: id
+          },
+          level,
+          hasPaidBefore: true,
+          eligible: true,
+          needsDonors: true
+        },
+        order: [ [ 'id', 'asc' ]],
+        include: [{
+          model: Account
+        },
+        {
+          model: Level
+        }]
+      })
+
+      res.json(candidate)
+    } catch (err) {
+      console.log('err -->', err)
+      res.status(500).send({
+        error: 'an error has occurred trying to getDonationCandidateByLevel'
+      })
+    }
+  },
+  async createDonationTransactionByLevel(req, res) {
+    try {
+      const { body } = req
+
+      const donation = await DonationTransaction.create(body)
+      res.send(donation)
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'an error has occurred trying to record this transaction'
+      })
+    }
+  },
+  async post(req, res) {
+    try {
+      const { body } = req
+      const donation = await DonationTransaction.create(body)
+      res.send(donation)
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'an error has occurred trying to record this transaction'
+      })
+    }
+  },
+  async put(req, res) {
+    try {
+      const donation = req.body
+      await DonationTransaction.update(donation, {
+        where: {
+          id: donation.id
+        }
+      })
+      res.json(req.body)
+
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'an error has occurred trying to update this transaction'
+      })
+    }
+  },
+  async remove(req, res) {
+    try {
+      const userId = req.user.id
+      const { donationId } = req.params
+      const donation = await DonationTransaction.findOne({
+        where: {
+          id: donationId,
+          UserId: userId
+        }
+      })
+      if (!donation) {
+        return res.status(403).send({
+          error: 'you do not have access to this transaction'
         })
       }
+      await donation.destroy()
+      res.send(donation)
+    } catch (err) {
+      res.status(500).send({
+        error: 'an error has occurred trying to delete the transaction'
+      })
+    }
+  },
+  async getCompletedDonationsByLevel(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() });
+    }
+
+    try {
+      let { level } = req.params
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          payment_status: 2,
+          level
+        },
+        include: [
+        {
+          model: User,
+          attributes: {
+            exclude: [
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json(transactions) 
+    } catch (err) {
+        console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch transactions for this level'
+      })
+    }
+  },
+  async getActiveDonationsByLevel(req, res) {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level } = req.params
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          level
+        },
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json(transactions) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
+  },
+  async previousTransactionsUser(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, UserId } = req.params
+      
+      let transactions = await DonationTransaction.findAll({
+        where:{
+           'level':{
+            [Op.lt]:level
+          },
+          'payment_status':2,
+          UserId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
     }
   }
-  
-  
+  ,
+  async previousTransactionsCandidate(req, res){
+      const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ 'status': false, errors: errors.mapped() })
+    }
+
+    try {
+      let { level, CandidateId } = req.params
+      console.log('styate', level)
+      let transactions = await DonationTransaction.findAll({
+        where:{
+          'level':{
+            [Op.lt]:level
+          },
+          'payment_status':2,
+          CandidateId
+        },
+        limit: 5,
+        include: [
+        {
+          model: User,
+          attributes:{
+            exclude:[
+              'password'
+            ]
+          }
+        },
+        {
+          model:User,
+          as:'Candidate',
+          attributes:{
+            exclude:[
+              'password'
+            ] 
+          }
+        }
+      ]
+    })
+
+    res.json({'state':true, 'data':transactions}) 
+    } catch (err) {
+      console.log('err-->', err)
+        res.status(500).send({
+        error: 'an error has occurred trying to fetch active transactions for this level'
+      })
+    }
+  }
+}
+

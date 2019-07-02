@@ -8,6 +8,7 @@ const RewardsTransactionController = require('./controllers/RewardsTransactionCo
 
 const isAuthenticated = require('./policies/isAuthenticated')
 const isAuthenticatedAdmin = require('./policies/isAuthenticatedAdmin')
+
 module.exports = (app) => {
   app.post('/register',
     validate_singup,
@@ -41,12 +42,25 @@ module.exports = (app) => {
   app.get('/donation/:history',
     isAuthenticated,  
     DonationTransactionController.index)
-  app.get('/donation/:level/:candidateId',
-    // isAuthenticated,  
+  app.get('/donation/:level/:CandidateId',
+    // isAuthenticated,   
     DonationTransactionController.getDonationCount)
+  app.get('/user/donation/count',
+    isAuthenticated,   
+    DonationTransactionController.getMyLevelDonationCount)
+  app.get('/user/donation/level',
+    isAuthenticated, 
+    DonationTransactionController.getCandidateByLevel)
   app.post('/donation',
     isAuthenticated,
     DonationTransactionController.post)
+   app.post('/previousTransactionsUser/:level/:UserId',
+    // isAuthenticated,
+    DonationTransactionController.previousTransactionsUser)
+  app.post('/previousTransactionsCandidate/:level/:CandidateId',
+    // isAuthenticated,
+    DonationTransactionController.previousTransactionsCandidate)
+
   app.put('/donation/:donationId',
     isAuthenticated,   
     DonationTransactionController.put)
@@ -66,19 +80,26 @@ module.exports = (app) => {
   app.delete('/rewards/:rewardId',
     isAuthenticated,  
     RewardsTransactionController.remove)
-   app.post('/admin-login',
+
+  app.get('/admin',
+    // isAuthenticatedAdmin,
+    AdminController.index)
+  app.post('/adminLogin',
     validate_admin_login,
     AuthenticationController.adminlogin)
-  app.post('/admin-add',
+  app.post('/admin',
     validate_admin_singup,
     AdminController.post)
-  app.get('/admins',
-    isAuthenticatedAdmin,
-    AdminController.index)
-  app.put('/admin/:adminid',
-    isAuthenticatedAdmin,   
+  app.put('/admin/:adminId',
+    // isAuthenticatedAdmin,   
     AdminController.put)
-  app.delete('/admin/:adminid',
-    isAuthenticatedAdmin,  
+  app.delete('/admin/:adminId',
+    // isAuthenticatedAdmin,  
     AdminController.remove)
+  app.get('/admin/donations/completed/:level',
+    // isAuthenticatedAdmin,  
+    DonationTransactionController.getCompletedDonationsByLevel)
+  app.get('/admin/donations/active/:level',
+    // isAuthenticatedAdmin,  
+    DonationTransactionController.getActiveDonationsByLevel)
 }

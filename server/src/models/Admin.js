@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs')
 const { hashPassword } = require('./../helpers')
 
 module.exports = (sequelize, DataTypes) => {
@@ -11,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
           name: {
           allowNull: false,
           type: DataTypes.STRING,
-         },
+        },
+        surname: {
+          allowNull: true,
+          type: DataTypes.STRING,
+        },
           username: {
             allowNull: false,
             type: DataTypes.STRING,
@@ -30,11 +35,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         {   
-          hooks: {
-              beforeCreate: hashPassword,
-              beforeUpdate: hashPassword,
-              beforeSave: hashPassword
-          },
+          hooks: {},
           timestamps: true
         })
     Admin.prototype.comparePassword = function (password) {

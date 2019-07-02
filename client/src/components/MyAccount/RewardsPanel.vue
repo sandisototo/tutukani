@@ -2,7 +2,7 @@
     <v-tabs id="mobile-tabs-5" fixed dark centered>
         <v-toolbar class="light-green darken-1" dark>
             <v-toolbar-title>Rewards <v-icon>card_giftcard</v-icon></v-toolbar-title>
-            <v-spacer></v-spacer>
+            <v-spacer></v-spacer> Reload
             <v-tabs-bar class="light-green darken-1" slot="extension">
                 <v-tabs-slider class="yellow"></v-tabs-slider>
                 <v-tabs-item href="#tab-1">
@@ -37,12 +37,37 @@
                         {{props.item.User.cell_number}}
                       </td>
                       <td class="text-xs-right">
-                        <!--{{props.item.payment_status}}-->
-                        <p v-if="props.item.payment_status === 0">Rigistered</p>
-                        <p v-if="props.item.payment_status === 1">Promised to pay</p>
-                        <p v-if="props.item.payment_status === 2">Completed</p>
-                        <p v-if="props.item.payment_status === 3">Expired</p>
+                        {{props.item.level}}
                       </td>
+                    <td class="text-xs-right">
+                    <p v-if="props.item.payment_status === 0 && props.item.User.level === 1" >
+                      <v-badge color="grey">
+                        <v-icon slot="badge" dark>how_to_reg</v-icon>
+                        <span>Rigistered</span>
+                      </v-badge></p>
+                      <p v-if="props.item.payment_status === 0 && props.item.User.level > 1">
+                      <v-badge color="grey">
+                        <v-icon slot="badge" dark>how_to_reg</v-icon>
+                        <span>Upgraded to level {{props.item.User.level}} </span>
+                      </v-badge></p>
+                    <p v-if="props.item.payment_status === 1">                      
+                      <v-badge color="orange">
+                        <v-icon slot="badge" dark>schedule</v-icon>
+                        <span>Promised to pay</span>
+                      </v-badge></p>
+                    <p v-if="props.item.payment_status === 2">   
+                      <v-badge color="green">
+                        <v-icon slot="badge" dark>check</v-icon>
+                        <span>Completed</span>
+                      </v-badge>
+                    </p>
+                    <p v-if="props.item.payment_status === 3">
+                      <v-badge color="red">
+                        <v-icon slot="badge" dark>error_outline</v-icon>
+                        <span>Expired</span>
+                      </v-badge>
+                      </p>
+                    </td>
                       <td class="text-xs-right">
                               <v-btn
                               small
@@ -78,9 +103,11 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import RewardsTransactionService from '@/services/RewardsTransactionService'
 import DonationTransactionService from '@/services/DonationTransactionService'
+import UserService from '@/services/UsersService'
+import bus from '@/helpers/bus'
 
 export default {
   data () {
@@ -99,6 +126,10 @@ export default {
           value: ''
         },
         {
+          text: 'Level',
+          value: ''
+        },
+        {
           text: 'Status',
           value: ''
         },
@@ -112,7 +143,8 @@ export default {
         descending: true
       },
       loading: false,
-      rewards: []
+      rewards: [],
+      isLevelComplete: false
     }
   },
   methods: {
@@ -121,6 +153,14 @@ export default {
         this.loading = true
         reward.payment_status = 2
         await DonationTransactionService.put(reward)
+        if (reward.level !== 1) {
+          const userData = {
+            id: reward.User.id,
+            hasPaidBefore: true,
+            needsDonors: true
+          }
+          await UserService.put(userData)
+        }
         this.loading = false
       } catch (err) {
         this.loading = false
@@ -129,19 +169,24 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      'isUserLoggedIn',
-      'user'
-    ])
+    ...mapState(['isUserLoggedIn', 'user'])
+  },
+  watch: {
+    rewards: {
+      handler: function (newVal, oldVal) {
+        let isLevelComplete = newVal.filter((a) => a.payment_status === 2).length >= this.user.Level.max_donors // this 2 varies on levels - needs change
+
+        if (isLevelComplete) {
+          bus.$emit('isLevelComplete', isLevelComplete)
+          this.isLevelComplete = true
+        }
+      },
+      deep: true,
+      immediate: true
+    }
   },
   async mounted () {
-    if (this.isUserLoggedIn) {
-      this.rewards = (await RewardsTransactionService.index()).data
-    }
+    this.rewards = (await RewardsTransactionService.index()).data
   }
 }
 </script>
-
-<style>
-
-</style>

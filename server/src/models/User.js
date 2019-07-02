@@ -56,25 +56,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    needsDonors: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     province: {
       allowNull: false,
       type: DataTypes.STRING,
     }
   },
   {
-    hooks: {
-      beforeUpdate: hashPassword,
-      beforeSave: hashPassword
-    },
+    hooks: {},
     timestamps: true
   })
 
   User.prototype.comparePassword = function (password) {
-    return bcrypt.compare(password, this.password)
+    // return bcrypt.compare(password, this.password)
+    return this.password === password
   }
 
   User.associate = function (models) {
     User.hasOne(models.Account)
+    User.belongsTo(models.Level, { foreignKey: 'level' })
   }
 
   return User

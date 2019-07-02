@@ -1,15 +1,15 @@
-const { User,Account, Admin} = require('../models')
+const { User, Account, Admin, Level} = require('../models')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')
 const { validationResult } = require('express-validator/check');
 
-function jwtSignUser (user) {
+function jwtSignUser(user) {
   const ONE_WEEK = 60 * 60 * 24 * 7
   return jwt.sign(user, config.authentication.jwtSecret, {
     expiresIn: ONE_WEEK
   })
 }
- 
+
 module.exports = {
   async register(req, res) {
     const errors = validationResult(req);
@@ -21,9 +21,15 @@ module.exports = {
 
       const newUser = await User.create(body)
       const account = await newUser.createAccount(body.Account)
- 
+      
+
       const userJson = newUser.toJSON()
       userJson['Account'] = account
+      userJson['Level'] = {
+        type: 1,
+        max_donors: 2,
+        amount: 6
+      }
       res.json({
         user: userJson,
         token: jwtSignUser(userJson)
@@ -33,7 +39,7 @@ module.exports = {
       const error = (err && err.name == 'SequelizeUniqueConstraintError') ?
         'Your cell number or email has been used to register here before.' :
         'Something went wrong!'
-      
+
       res.status(400).send({
         error
       })
@@ -49,6 +55,9 @@ module.exports = {
         include: [
           {
             model: Account
+          },
+          {
+            model: Level
           }
         ]
       })
@@ -74,17 +83,17 @@ module.exports = {
     } catch (err) {
       console.log('err--->', err)
       res.status(500).send({
-        error: 'An error has occured trying to log in'
+        error: 'An error has occurred trying to log in'
       })
     }
   },
- async adminlogin(req, res) {
-  const errors = validationResult(req);
+  async adminlogin(req, res) {
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(403).json({ 'status': false, errors: errors.mapped() });
     }
     try {
-      const {username, level, password} = req.body
+      const { username, level, password } = req.body
       const user = await Admin.findOne({
         where: {
           username,
@@ -94,11 +103,11 @@ module.exports = {
 
       if (!user) {
         return res.status(403).send({
-          error: 'User not found. Please sign up first.'
+          error: 'User not found. Please ask to be added as admin.'
         })
       }
 
-      const isPasswordValid = await Admin.comparePassword(password)
+      const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) {
         return res.status(403).send({
           error: 'The password is incorrect'
@@ -111,8 +120,9 @@ module.exports = {
         token: jwtSignUser(userJson)
       })
     } catch (err) {
+      console.log('err-->', err)
       res.status(500).send({
-        error: 'An error has occured trying to log in'
+        error: 'An error has occurred trying to log in'
       })
     }
   },

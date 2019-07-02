@@ -6,24 +6,30 @@
 </template>
 <script>
 import AdminHeader from '@/components/includes/AdminHeader.vue'
-import Donations from './Donations'
+
 export default {
   components: {
-    AdminHeader,
-    Donations
+    AdminHeader
+  },
+  data () {
+    return {}
   },
   props: {
     source: String
   },
+  methods: {
+    reset () {
+      this.$store.dispatch('setToken', null)
+      this.$store.dispatch('setUser', null)
+    }
+  },
   async mounted () {
-    this.$store.state.isUserLoggedIn = false
-    this.$store.dispatch('setToken', null)
-    this.$store.dispatch('setUser', null)
-    this.$store.dispatch('setAdmin', {
-      name: 'Sand',
-      surname: 'Toto',
-      level: 1
-    })
+    this.reset()
+    if (!this.$store.state.isAdmin) {
+      this.$router.push({
+        name: 'admin'
+      })
+    }
   }
 }
 </script>

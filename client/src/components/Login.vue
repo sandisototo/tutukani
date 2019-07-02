@@ -1,7 +1,7 @@
 <template>
   <v-layout column >
     <v-flex xs6 offset-xs3>
-      <panel title="Login">
+      <panel title="User Login">
         <v-text-field
           label="Cellphone Number"
           v-model="username"
@@ -50,6 +50,12 @@ export default {
     }
   },
   methods: {
+    reset () {
+      this.$store.state.isUserLoggedIn = false
+      this.$store.dispatch('setToken', null)
+      this.$store.dispatch('setUser', null)
+      this.$store.dispatch('setAdmin', null)
+    },
     async login () {
       this.error = null
       try {
@@ -69,10 +75,7 @@ export default {
     }
   },
   async mounted () {
-    this.$store.state.isUserLoggedIn = false
-    this.$store.dispatch('setToken', null)
-    this.$store.dispatch('setUser', null)
-    this.$store.dispatch('setAdmin', null)
+    this.reset()
   }
 }
 </script>

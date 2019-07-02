@@ -1,7 +1,7 @@
 <template>
-  <v-footer height="auto">
+  <v-footer height="auto" v-if="!$store.state.isAdmin">
     <v-card flat tile class="flex">
-      <v-card-title class="light-green darken-1 white--text">
+      <v-card-title class="primary white--text" v-bind:class="{ 'light-green darken-1 white--text': $route.name !== 'admin' }">
         <strong class="subheading">Get connected with us on social networks!</strong>
         <v-spacer></v-spacer>
         <v-btn

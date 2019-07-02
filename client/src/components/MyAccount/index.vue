@@ -1,10 +1,10 @@
 <template>
-  <v-layout>
-    <v-flex xs6>
+  <v-layout column>
+    <v-flex >
       <donations-panel/>
     </v-flex>
 
-    <v-flex xs6 class="ml-2">
+    <v-flex class="mt-2">
       <rewards-panel />
     </v-flex>
   </v-layout>
